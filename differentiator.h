@@ -1,0 +1,83 @@
+#ifndef DIFFERENTIATOR_H
+#define DIFFERENTIATOR_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <math.h>
+#include <ctype.h>
+#include <locale.h>
+#include <termios.h>
+#include <unistd.h>
+
+#include "libraries/common.h"
+#include "tree.h"
+#include "Recursive_descent.h"
+#include "libraries/stack.h"
+
+#define RED_TEXT(text) "\e[31m" #text "\e[0m"
+
+const size_t MAX_STR_SIZE = 250;
+
+enum COMMAND {
+    COMMAND_1 = 49,
+    COMMAND_2 = 50,
+    COMMAND_3 = 51,
+    COMMAND_4 = 52,
+    COMMAND_5 = 53,
+    COMMAND_6 = 54,
+    COMMAND_7 = 55,
+};
+
+void start_programm (struct Tree* tree);
+
+void main_menu (struct Tree* tree);
+
+void processing_selected_mode (struct Tree* tree);
+
+//---------------------------------------------------------------------------------
+
+void value_function_at_point (struct Tree* tree);
+
+//---------------------------------------------------------------------------------
+
+void menu_derivative (struct Tree* tree);
+
+Knot* derivative (struct Knot* current_knot);
+
+//---------------------------------------------------------------------------------
+
+int get_command ();
+
+void graph_open (struct Tree* tree);
+
+//---------------------------------------------------------------------------------
+
+void simplification_tree (struct Tree* tree);
+
+void convolution_const (struct Tree* tree, struct Knot* current_knot);
+
+void neutralization (struct Tree* tree, struct Knot* current_knot);
+
+void relinking_subtree(struct Tree* tree, struct Knot* current_knot, struct Knot* subtree_linking, struct Knot* subtree_delete);
+
+int type_knot (struct Knot* current_knot);
+
+double calculate_knot (struct Knot* current_knot);
+
+struct Stack* tree_search_varieble (struct Knot* current_knot);
+
+int knot_varieble_search (struct Knot* current_knot, struct Stack* path_element);
+
+//---------------------------------------------------------------------------------
+
+FILE* tex_open ();
+
+void tex_tree_print (FILE* tex, struct Tree* tree, char* text);
+
+void tree_print (FILE* tex, struct Knot* knot);
+
+void tex_close (FILE* tex);
+
+#endif // DIFFERENTIATOR_H

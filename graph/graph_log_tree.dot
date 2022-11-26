@@ -1,0 +1,8 @@
+digraph G
+{
+	graph [dpi = 250];
+	rankdir = TB;
+	"0x604000001310" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
+		label = "prev = 0x0 \lcurrent = 0x604000001310 | {<left> left = 0x0| 0,000000 | <right> right = 0x0}"]
+
+}
