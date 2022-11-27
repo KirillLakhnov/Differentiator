@@ -21,8 +21,9 @@ void main_menu (struct Tree* tree)
     printf ("[" RED_TEXT(3) "] Разложить по Маклорену\n");
     printf ("[" RED_TEXT(4) "] Разложить по Тейлеру\n");
     printf ("[" RED_TEXT(5) "] Узнать функцию касательной\n");
-    printf ("[" RED_TEXT(6) "] Вывести дамп\n");
-    printf ("[" RED_TEXT(7) "] Выйти из программы\n");
+    printf ("[" RED_TEXT(6) "] Построить график функции\n");
+    printf ("[" RED_TEXT(7) "] Вывести дамп\n");
+    printf ("[" RED_TEXT(8) "] Выйти из программы\n");
 
     processing_selected_mode (tree);
 }
@@ -54,12 +55,16 @@ void processing_selected_mode (struct Tree* tree)
             menu_tangent_equation (tree);
             break;
         case COMMAND_6:
+            screen_clear ();
+            menu_graph_function (tree);
+            break;
+        case COMMAND_7:
             tree_graph_dump (tree);
             graph_open (tree);
             screen_clear ();
             main_menu (tree);
             break;
-        case COMMAND_7:
+        case COMMAND_8:
             tex_close (tree->tex);
             tree_dtor (tree);
             return;
@@ -501,6 +506,151 @@ void tangent_equation_at_point (struct Tree* tree, double point_value)
     tree->root = add_knot;
 
     simplification_tree (tree, tree->root);
+}
+
+//---------------------------------------------------------------------------------
+
+void menu_graph_function (struct Tree* tree)
+{
+    screen_clear ();
+
+    FILE* graph_gnuplot = fopen ("graph_func/graph_function.gnuplot", "w");
+    fprintf (graph_gnuplot, "reset\n");
+
+    printf ("Будете ли вы выбирать значения ограничений для графика?\n");
+
+    printf ("[" RED_TEXT(1) "] Да\n");
+    printf ("[" RED_TEXT(2) "] Нет\n");
+
+    processing_selected_graph_function_mode (tree, graph_gnuplot);
+
+    fprintf (graph_gnuplot, "set grid\n");
+    fprintf (graph_gnuplot, "set title \"График вашей функции\" font \"Helvetica Bold, 20\"\n");
+    fprintf (graph_gnuplot, "set terminal png\n");
+    fprintf (graph_gnuplot, "set output \"graph_func/graph.png\"\n");
+    fprintf (graph_gnuplot, "plot ");
+    tree_print_file (tree->root, graph_gnuplot);
+
+    fclose (graph_gnuplot);
+}
+
+void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnuplot)
+{
+    int mode = get_command();
+
+    switch (mode)
+    {
+        case COMMAND_1:  
+        {
+            screen_clear ();
+
+            printf ("Введите максимальное значение по оси X: ");
+            int max_value_x = 0;
+            scanf ("%d", &max_value_x);
+            printf ("\n");
+
+            printf ("Введите минимальное значение по оси X: ");
+            int min_value_x = 0;
+            scanf ("%d", &min_value_x);
+            printf ("\n");
+
+            fprintf (graph_gnuplot, "set xrange[%d:%d]\n", min_value_x, max_value_x);
+
+            printf ("Введите максимальное значение по оси Y: ");
+            int max_value_y = 0;
+            scanf ("%d", &max_value_y);
+            printf ("\n");
+
+            printf ("Введите минимальное значение по оси Y: ");
+            int min_value_y = 0;
+            scanf ("%d", &min_value_y);
+            printf ("\n");
+
+            fprintf (graph_gnuplot, "set yrange[%d:%d]\n", min_value_y, max_value_y);
+
+            return;
+        }
+        case COMMAND_2: 
+            screen_clear (); 
+            return;
+        default: 
+            printf("Неверный режим %c, попробуй еще раз\n", mode);
+            processing_selected_mode (tree); 
+    }
+}
+
+void tree_print_file (struct Knot* knot, FILE* graph_gnuplot)
+{
+    if (knot->type != NUMBER && knot->type != VARIABLE)
+    {
+        fprintf (graph_gnuplot, "(");
+    }
+
+    if (!knot)
+    {
+        return;
+    }
+
+    if (knot->left)
+    {
+        tree_print_file (knot->left, graph_gnuplot);
+    }
+
+    if (knot->type == NUMBER)
+    {
+        if (knot->value == (int)knot->value)
+        {
+            fprintf (graph_gnuplot, "%d", (int)knot->value);
+        }
+        else
+        {
+            fprintf (graph_gnuplot, "%lf", knot->value);
+        }
+    }
+    else if (knot->type == VARIABLE)
+    {
+       fprintf (graph_gnuplot, "%s", knot->variable);
+    }
+    else if (knot->type == OPERATION)
+    {
+        switch (knot->op_type)
+        {
+            case (ADD): fprintf (graph_gnuplot, "+");  break;
+            case (SUB): fprintf (graph_gnuplot, "-");  break;
+            case (MUL): fprintf (graph_gnuplot, "*");  break;
+            case (POW): fprintf (graph_gnuplot, "**"); break;
+            case (DIV): fprintf (graph_gnuplot, "/");  break;
+            default:
+            {
+
+            }
+        }
+    }
+    else if (knot->type == FUNCTION)
+    {
+        switch (knot->function)
+        {
+            case (SIN): fprintf (graph_gnuplot, "sin"); break;
+            case (COS): fprintf (graph_gnuplot, "cos"); break;
+            case (TG):  fprintf (graph_gnuplot, "tg");  break;
+            case (CTG): fprintf (graph_gnuplot, "ctg"); break;
+            case (LN):  fprintf (graph_gnuplot, "ln");  break;
+            default:
+            {
+
+            }
+        }
+    }
+    
+    if (knot->right)
+    {
+        tree_print_file (knot->right, graph_gnuplot);
+    }
+
+    if (knot->type != NUMBER && knot->type != VARIABLE)
+    {
+        fprintf (graph_gnuplot, ")");
+    }
 }
 
 //---------------------------------------------------------------------------------
