@@ -351,11 +351,8 @@ void simplification_tree (struct Tree* tree)
     int convolution_const_rezult = 1;
     int neutralization_rezult = 1;
 
-    while (convolution_const_rezult != 0 && neutralization_rezult != 0)
-    {
-        convolution_const_rezult = convolution_const (tree, tree->root);
-        neutralization_rezult = neutralization (tree, tree->root);
-    }
+    convolution_const (tree, tree->root);
+    neutralization (tree, tree->root);
 }
 
 void convolution_const (struct Tree* tree, struct Knot* current_knot)
