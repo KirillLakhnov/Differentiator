@@ -1,0 +1,2 @@
+all: main.cpp tree.cpp Recursive_descent.cpp differentiator.cpp libraries/FileProcessing.cpp libraries/common.cpp libraries/stack.cpp libraries/stack_common.cpp
+	clang main.cpp tree.cpp Recursive_descent.cpp differentiator.cpp libraries/FileProcessing.cpp libraries/common.cpp libraries/stack.cpp libraries/stack_common.cpp -fsanitize=address -g -o Diff
