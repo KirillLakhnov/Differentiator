@@ -532,6 +532,10 @@ void menu_graph_function (struct Tree* tree)
     tree_print_file (tree->root, graph_gnuplot);
 
     fclose (graph_gnuplot);
+
+    system ("gnuplot graph_func/graph_function.gnuplot");
+
+    fprintf (tree->tex, "\\\\\\includegraphics{graph_func/graph.png}"\\\\);
 }
 
 void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnuplot)
