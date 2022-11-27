@@ -62,6 +62,14 @@ void maclaurin_decomposition (struct Tree* tree, int order);
 
 //---------------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------------
+
+void menu_tangent_equation (struct Tree* tree);
+
+void tangent_equation_at_point (struct Tree* tree, double point_value);
+
+//---------------------------------------------------------------------------------
+
 int get_command ();
 
 void graph_open (struct Tree* tree);

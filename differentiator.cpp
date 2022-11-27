@@ -50,11 +50,9 @@ void processing_selected_mode (struct Tree* tree)
 
             break;
         case COMMAND_5:
-        {
             screen_clear ();
-
+            menu_tangent_equation (tree);
             break;
-        }
         case COMMAND_6:
             tree_graph_dump (tree);
             graph_open (tree);
@@ -446,6 +444,63 @@ void maclaurin_decomposition (struct Tree* tree, int order)
     }
 
     tree_dtor (tree_copy);
+}
+
+//---------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------
+
+void menu_tangent_equation (struct Tree* tree)
+{
+    screen_clear ();
+
+    double point_value = 0;
+
+    printf ("Введите значение точки, в которой хотите найти уравнение касательной для вашей функции: ");
+    scanf ("%lf", &point_value);
+
+    clear_input ();
+
+    tangent_equation_at_point (tree, point_value);
+    TEX_TEXT_PRINT (tree->tex, tree, "\\\\\\\\Уравнение касательная к вашей функции в точке %lf: \\\\", point_value);
+
+    main_menu (tree);
+}
+
+void tangent_equation_at_point (struct Tree* tree, double point_value)
+{
+    Tree* tree_value_point = value_function_at_point_counter (tree, point_value);
+    tree->root = derivative (tree->root);
+    Tree* tree_derivative_value_point = value_function_at_point_counter (tree, point_value);
+
+    knot_dtor (tree->root);
+    tree->root = tree_derivative_value_point->root;
+
+    Knot* add_knot = knot_creater (tree_value_point->root->prev, tree_value_point->root, nullptr, OPERATION);
+    add_knot->op_type = ADD;
+    tree_value_point->root->prev = add_knot;
+
+    Knot* mul_knot = knot_creater (add_knot, tree->root, nullptr, OPERATION);
+    mul_knot->op_type = MUL;
+    add_knot->right = mul_knot;
+    tree->root->prev = mul_knot;
+
+    Knot* sub_knot = knot_creater (mul_knot, nullptr, nullptr, OPERATION);
+    sub_knot->op_type = SUB;
+    mul_knot->right = sub_knot;
+
+    sub_knot->right = knot_creater (sub_knot, nullptr, nullptr, NUMBER);
+    sub_knot->right->value = point_value;
+
+    sub_knot->left = knot_creater (sub_knot, nullptr, nullptr, VARIABLE);
+    //заполнить имя переменной нормально
+    sub_knot->left->variable = (char*) calloc (MAX_LEN_STR, sizeof(char));
+    strcpy (sub_knot->left->variable, "x");
+    //заполнить имя переменной нормально
+
+    tree->root = add_knot;
+
+    simplification_tree (tree, tree->root);
 }
 
 //---------------------------------------------------------------------------------
