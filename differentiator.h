@@ -18,6 +18,10 @@
 
 #define RED_TEXT(text) "\e[31m" #text "\e[0m"
 
+#define TEX_TEXT_PRINT(tree_tex, tree, ...)     char tex_text[MAX_LEN_CMD] = "";                                    \
+                                                snprintf (tex_text, MAX_LEN_CMD, __VA_ARGS__);                      \
+                                                tex_tree_print (tree_tex, tree, tex_text);
+
 const size_t MAX_STR_SIZE = 250;
 
 enum COMMAND {
@@ -38,13 +42,23 @@ void processing_selected_mode (struct Tree* tree);
 
 //---------------------------------------------------------------------------------
 
-void value_function_at_point (struct Tree* tree);
+void menu_value_function_at_point (struct Tree* tree);
+
+Tree* value_function_at_point_counter (struct Tree* tree, double point_value);
 
 //---------------------------------------------------------------------------------
 
 void menu_derivative (struct Tree* tree);
 
+void processing_selected_derivative_mode (struct Tree* tree);
+
 Knot* derivative (struct Knot* current_knot);
+
+//---------------------------------------------------------------------------------
+
+void menu_maclaurin_decomposition (struct Tree* tree);
+
+void maclaurin_decomposition (struct Tree* tree, int order);
 
 //---------------------------------------------------------------------------------
 
@@ -54,7 +68,7 @@ void graph_open (struct Tree* tree);
 
 //---------------------------------------------------------------------------------
 
-void simplification_tree (struct Tree* tree);
+void simplification_tree (struct Tree* tree, struct Knot* current_knot);
 
 void convolution_const (struct Tree* tree, struct Knot* current_knot);
 
@@ -65,6 +79,8 @@ void relinking_subtree(struct Tree* tree, struct Knot* current_knot, struct Knot
 int type_knot (struct Knot* current_knot);
 
 double calculate_knot (struct Knot* current_knot);
+
+//---------------------------------------------------------------------------------
 
 struct Stack* tree_search_varieble (struct Knot* current_knot);
 

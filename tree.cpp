@@ -24,8 +24,14 @@ void tree_dtor (struct Tree* tree)
 {
     ASSERT_OK_TREE(tree);
 
-    TextDtor (tree->buffer_function);
-    tree->file_function->file_name = nullptr;
+    if (tree->buffer_function != nullptr)
+    {
+        TextDtor (tree->buffer_function);
+    }
+    if (tree->file_function != nullptr)
+    {
+        tree->file_function->file_name = nullptr;
+    }
 
     knot_dtor (tree->root);
 

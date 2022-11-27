@@ -3,8 +3,9 @@
 void start_programm (struct Tree* tree)
 {
     tree_ctor (tree);
-    simplification_tree (tree);
-    tex_tree_print (tree->tex, tree, "Ваша изначальная функция");
+    simplification_tree (tree, tree->root);
+
+    TEX_TEXT_PRINT(tree->tex, tree, "\\\\\\\\Ваша изначальная функция: \\\\");
 
     main_menu (tree);
 }
@@ -17,8 +18,8 @@ void main_menu (struct Tree* tree)
 
     printf ("[" RED_TEXT(1) "] Узнать значение функции в точке\n");
     printf ("[" RED_TEXT(2) "] Взять проивзодную\n");
-    printf ("[" RED_TEXT(3) "] Разложить по Тейлеру\n");
-    printf ("[" RED_TEXT(4) "] Разложить по Маклорену\n");
+    printf ("[" RED_TEXT(3) "] Разложить по Маклорену\n");
+    printf ("[" RED_TEXT(4) "] Разложить по Тейлеру\n");
     printf ("[" RED_TEXT(5) "] Узнать функцию касательной\n");
     printf ("[" RED_TEXT(6) "] Вывести дамп\n");
     printf ("[" RED_TEXT(7) "] Выйти из программы\n");
@@ -34,7 +35,7 @@ void processing_selected_mode (struct Tree* tree)
     {
         case COMMAND_1:  
             screen_clear ();
-            value_function_at_point (tree);
+            menu_value_function_at_point (tree);
             break;
         case COMMAND_2: 
             screen_clear (); 
@@ -42,7 +43,7 @@ void processing_selected_mode (struct Tree* tree)
             break;
         case COMMAND_3: 
             screen_clear ();
-
+            menu_maclaurin_decomposition (tree);
             break;
         case COMMAND_4:
             screen_clear ();
@@ -51,8 +52,7 @@ void processing_selected_mode (struct Tree* tree)
         case COMMAND_5:
         {
             screen_clear ();
-            Tree* tree_new = tree_clone (tree->root);
-            tree_graph_dump (tree_new);
+
             break;
         }
         case COMMAND_6:
@@ -73,13 +73,52 @@ void processing_selected_mode (struct Tree* tree)
 
 //---------------------------------------------------------------------------------
 
-void value_function_at_point (struct Tree* tree)
+void menu_value_function_at_point (struct Tree* tree)
 {
     screen_clear ();
 
+    double point_value = 0;
+
     printf ("Введите значение точки:\t");
-    int point_value = 0;
-    scanf ("%d", &point_value);
+    scanf ("%lf", &point_value);
+
+    clear_input ();
+
+    Tree* tree_copy = value_function_at_point_counter (tree, point_value);
+
+    TEX_TEXT_PRINT(tree->tex, tree_copy, "\\\\\\\\Значение вашей функции в точке %lf: \\\\", point_value);
+
+    tree_dtor (tree_copy);
+
+    main_menu (tree);
+}
+
+Tree* value_function_at_point_counter (struct Tree* tree, double point_value)
+{
+    Tree* tree_copy = tree_clone (tree->root);
+
+    Stack* find_varieble = tree_search_varieble (tree_copy->root);
+
+    while (find_varieble->size != 0)
+    {
+        Knot* varieble_knot = find_varieble->data[find_varieble->size - 1];
+        free (varieble_knot->variable);
+        varieble_knot->type = NUMBER;
+        varieble_knot->value = point_value;
+
+        StackDtor (find_varieble);
+        if (find_varieble != nullptr)
+        {
+            free (find_varieble);
+            find_varieble = nullptr;
+        }
+
+        find_varieble = tree_search_varieble (tree_copy->root);
+    }
+
+    simplification_tree (tree_copy, tree_copy->root);
+
+    return tree_copy;
 }
 
 //---------------------------------------------------------------------------------
@@ -93,19 +132,45 @@ void menu_derivative (struct Tree* tree)
     int num = 0;
     scanf ("%d", &num);
 
-    simplification_tree (tree);
+    simplification_tree (tree, tree->root);
 
     for (int i = 0; i < num; i++)
     {
         tree->root = derivative (tree->root);
-        simplification_tree (tree);
+        simplification_tree (tree, tree->root);
         tree_graph_dump (tree);
-        tex_tree_print (tree->tex, tree, "Очередная производная");
+        TEX_TEXT_PRINT(tree->tex, tree, "\\\\\\\\Очередная производная: \\\\");
     }
 
     clear_input ();
+    screen_clear ();
 
-    main_menu (tree);
+    printf ("Хотите найти значение данной производной в функции?\n");
+
+    printf ("[" RED_TEXT(1) "] Да\n");
+    printf ("[" RED_TEXT(2) "] Нет\n");
+
+    processing_selected_derivative_mode (tree);
+}
+
+void processing_selected_derivative_mode (struct Tree* tree)
+{
+    int mode = get_command();
+
+    switch (mode)
+    {
+        case COMMAND_1:  
+            screen_clear ();
+            menu_value_function_at_point (tree);
+            break;
+        case COMMAND_2: 
+            screen_clear (); 
+            main_menu (tree);
+            break;
+        default: 
+            printf("Неверный режим %c, попробуй еще раз\n", mode);
+            processing_selected_mode (tree); 
+    }
 }
 
 Knot* derivative (struct Knot* current_knot)
@@ -313,6 +378,78 @@ Knot* derivative (struct Knot* current_knot)
 
 //---------------------------------------------------------------------------------
 
+void menu_maclaurin_decomposition (struct Tree* tree)
+{
+    int order = 0;
+
+    printf ("До какого порядка вы хотите разложить вашу функцию? ");
+    scanf ("%d", &order);
+
+    clear_input ();
+
+    maclaurin_decomposition (tree, order);
+
+    simplification_tree (tree, tree->root);
+
+    TEX_TEXT_PRINT (tree->tex, tree, "\\\\\\\\Разложение вашей функции по Маклорену до %d порядка: \\\\", order);
+
+    fprintf (tree->tex, "+ {o({x}^{%d})}", order);
+
+    main_menu (tree);
+}
+
+void maclaurin_decomposition (struct Tree* tree, int order)
+{
+    Tree* tree_copy = tree_clone (tree->root);
+    Tree* tree_value_zero = value_function_at_point_counter (tree, 0);
+    knot_dtor (tree->root);
+    tree->root = tree_value_zero->root;
+
+    for (int i = 1; i <= order; i++)
+    {
+        tree_copy->root = derivative (tree_copy->root);
+        Tree* tree_copy_point_zero = value_function_at_point_counter (tree_copy, 0);
+
+        Knot* add_knot = knot_creater (tree->root->prev, tree->root, nullptr, OPERATION);
+        add_knot->op_type = ADD;
+
+        Knot* div_knot = knot_creater (add_knot, nullptr, nullptr, OPERATION);
+        div_knot->op_type = DIV;
+        add_knot->right = div_knot;
+
+        Knot* mul_knot = knot_creater (div_knot, tree_copy_point_zero->root, nullptr, OPERATION);
+        mul_knot->op_type = MUL;
+        div_knot->left = mul_knot;
+        tree_copy_point_zero->root->prev = mul_knot;
+
+        Knot* pow_knot = knot_creater(mul_knot, nullptr, nullptr, OPERATION);
+        pow_knot->op_type = POW;
+        mul_knot->right = pow_knot;
+
+        Knot* factorial_knot = knot_creater (div_knot, nullptr, nullptr, NUMBER);
+        factorial_knot->value = factorial (i);
+        div_knot->right = factorial_knot;
+
+        Knot* varieble_knot = knot_creater (pow_knot, nullptr, nullptr, VARIABLE);
+        pow_knot->left = varieble_knot;
+        //заполнить имя переменной нормально
+        varieble_knot->variable = (char*) calloc (MAX_LEN_STR, sizeof(char));
+        strcpy (varieble_knot->variable, "x");
+        //заполнить имя переменной нормально
+
+        Knot* pow_degree_knot = knot_creater (pow_knot, nullptr, nullptr, NUMBER);
+        pow_degree_knot->value = i;
+        pow_knot->right = pow_degree_knot;
+
+        tree->root->prev = add_knot;
+        tree->root = add_knot;
+    }
+
+    tree_dtor (tree_copy);
+}
+
+//---------------------------------------------------------------------------------
+
 int get_command ()
 {
     struct termios oldt = {};
@@ -346,13 +483,10 @@ void graph_open (struct Tree* tree)
 
 //---------------------------------------------------------------------------------
 
-void simplification_tree (struct Tree* tree)
+void simplification_tree (struct Tree* tree, struct Knot* current_knot)
 {
-    int convolution_const_rezult = 1;
-    int neutralization_rezult = 1;
-
-    convolution_const (tree, tree->root);
-    neutralization (tree, tree->root);
+    convolution_const (tree, current_knot);
+    neutralization (tree, current_knot);
 }
 
 void convolution_const (struct Tree* tree, struct Knot* current_knot)
@@ -574,7 +708,7 @@ void neutralization (struct Tree* tree, struct Knot* current_knot)
     }
 }
 
-void relinking_subtree(struct Tree* tree, struct Knot* current_knot, struct Knot* subtree_linking, struct Knot* subtree_delete)
+void relinking_subtree (struct Tree* tree, struct Knot* current_knot, struct Knot* subtree_linking, struct Knot* subtree_delete)
 {
     if (current_knot == tree->root) 
     {
@@ -585,11 +719,11 @@ void relinking_subtree(struct Tree* tree, struct Knot* current_knot, struct Knot
     {
         subtree_linking->prev = current_knot->prev;
 
-        if (current_knot->prev->left  == current_knot) 
+        if (current_knot->prev != nullptr && current_knot->prev->left == current_knot) 
         {
-            current_knot->prev->left  = subtree_linking;
+            current_knot->prev->left = subtree_linking;
         }
-        if (current_knot->prev->right == current_knot) 
+        if (current_knot->prev != nullptr && current_knot->prev->right == current_knot) 
         {
             current_knot->prev->right = subtree_linking;
         }
@@ -711,6 +845,18 @@ int knot_varieble_search (struct Knot* current_knot, struct Stack* path_element)
             StackPop(path_element);
             return 0;
         }
+        else if (current_knot->left == nullptr && current_knot->right != nullptr)
+        {
+            if (knot_varieble_search (current_knot->right, path_element))
+            {
+                return 1;
+            }
+            else
+            {
+                StackPop (path_element);
+                return 0;
+            }
+        }
 
         return 0;
     }
@@ -747,13 +893,12 @@ void tex_tree_print (FILE* tex, struct Tree* tree, char* text)
     assert (text);
 
     fprintf (tex, "\n");
-    fprintf (tex, "%s: \\\\", text);
+    fprintf (tex, "%s", text);
     fprintf (tex, "\n");
 
     fprintf (tex, "\\\\{$");
     tree_print (tex, tree->root);
-    fprintf (tex, "$}\\\\");
-    fprintf (tex, "\\\\");
+    fprintf (tex, "$}");
 }
 
 void tree_print (FILE* tex, struct Knot* knot)
@@ -783,7 +928,14 @@ void tree_print (FILE* tex, struct Knot* knot)
 
     if (knot->type == NUMBER)
     {
-        fprintf (tex, "%lf", knot->value);
+        if (knot->value == (int)knot->value)
+        {
+            fprintf (tex, "%d", (int)knot->value);
+        }
+        else
+        {
+            fprintf (tex, "%lf", knot->value);
+        }
     }
     else if (knot->type == VARIABLE)
     {

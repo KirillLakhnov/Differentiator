@@ -38,4 +38,6 @@ int stricmp (const char* str1, const char* str2);
 
 char* bracket_find (char* current_position);
 
+int factorial (int value);
+
 #endif // COMMON_H

@@ -31,3 +31,20 @@ char* bracket_find (char* current_position)
 
     return current_position + i;
 }
+
+int factorial (int value)
+{
+    int factorial_value = 1;
+
+    if (value == 0)
+    {
+        return factorial_value;
+    }
+
+    for (int i = 1; i <= value; i++)
+    {
+        factorial_value *= i;
+    }
+
+    return factorial_value;
+}
