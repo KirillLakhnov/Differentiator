@@ -22,10 +22,6 @@
                                                 snprintf (tex_text, MAX_LEN_CMD, __VA_ARGS__);                      \
                                                 tex_tree_print (tree_tex, tree, tex_text);
 
-#define STRCPY(string, ...) char copy_string[MAX_LEN_STR] = {0};                 \
-                            snprintf (copy_string, MAX_LEN_STR, __VA_ARGS__);   \
-                            strcpy (string, copy_string);                       \
-                            string += (strlen (copy_string) + 1);                     
 
 const size_t MAX_STR_SIZE = 250;
 
@@ -38,6 +34,7 @@ enum COMMAND {
     COMMAND_6 = 54,
     COMMAND_7 = 55,
     COMMAND_8 = 56,
+    COMMAND_9 = 57,
 };
 
 void start_programm (struct Tree* tree);

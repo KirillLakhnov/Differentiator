@@ -29,6 +29,11 @@
 #define ASSERT_OK(tree)
 #endif
 
+#define KNOT_FUCK_STR(knot_func, func)  if (knot_func == func)          \
+                                        {                               \
+                                            strcpy (function, #func);   \
+                                        }                           
+
 const size_t MAX_LEN_STR = 300;
 const size_t DTOR_SIZE_T = 0xBABADEDA;
 const int DTOR_INT = 0xBABADEAD;
@@ -53,7 +58,6 @@ enum TYPE {
     NUMBER      = 2,
     VARIABLE    = 3,
     FUNCTION    = 4,
-    CONST       = 5,
 };
 
 enum OPERATION_TYPE {
@@ -81,6 +85,17 @@ enum MATH_FUNC {
     ARCTG  = 8,
 
     LN = 9,
+
+    SH  = 10,
+    CH  = 11,
+    TH  = 12,
+    CTH = 13,
+
+    ARCSH  = 14,
+    ARCCH  = 15,
+    ARCTH  = 16,
+
+    EXP = 17,
 };
 
 struct Knot

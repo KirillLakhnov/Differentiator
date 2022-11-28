@@ -22,8 +22,9 @@ void main_menu (struct Tree* tree)
     printf ("[" RED_TEXT(4) "] Разложить по Тейлеру\n");
     printf ("[" RED_TEXT(5) "] Узнать функцию касательной\n");
     printf ("[" RED_TEXT(6) "] Построить график функции\n");
-    printf ("[" RED_TEXT(7) "] Вывести дамп\n");
-    printf ("[" RED_TEXT(8) "] Выйти из программы\n");
+    printf ("[" RED_TEXT(7) "] Полное исследование функции\n");
+    printf ("[" RED_TEXT(8) "] Вывести дамп\n");
+    printf ("[" RED_TEXT(9) "] Выйти из программы\n");
 
     processing_selected_mode (tree);
 }
@@ -59,14 +60,19 @@ void processing_selected_mode (struct Tree* tree)
             menu_graph_function (tree);
             break;
         case COMMAND_7:
+
+            break;
+        case COMMAND_8:
             tree_graph_dump (tree);
             graph_open (tree);
             screen_clear ();
             main_menu (tree);
             break;
-        case COMMAND_8:
+        case COMMAND_9:
             tex_close (tree->tex);
             tree_dtor (tree);
+            system ("pdflatex tex/diff.tex");
+            system ("open diff.pdf");
             return;
         default: 
             printf("Неверный режим %c, попробуй еще раз\n", mode);
@@ -367,10 +373,6 @@ Knot* derivative (struct Knot* current_knot)
             }
             break;
         }
-        case CONST:
-        {
-            break;
-        }
         default:
         {
 
@@ -535,7 +537,9 @@ void menu_graph_function (struct Tree* tree)
 
     system ("gnuplot graph_func/graph_function.gnuplot");
 
-    fprintf (tree->tex, "\\\\\\includegraphics{graph_func/graph.png}"\\\\);
+    fprintf (tree->tex, "\\\\\\includegraphics{graph_func/graph.png}\\\\");
+
+    main_menu (tree);
 }
 
 void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnuplot)
@@ -634,11 +638,29 @@ void tree_print_file (struct Knot* knot, FILE* graph_gnuplot)
     {
         switch (knot->function)
         {
-            case (SIN): fprintf (graph_gnuplot, "sin"); break;
-            case (COS): fprintf (graph_gnuplot, "cos"); break;
-            case (TG):  fprintf (graph_gnuplot, "tg");  break;
-            case (CTG): fprintf (graph_gnuplot, "ctg"); break;
-            case (LN):  fprintf (graph_gnuplot, "ln");  break;
+            case (SIN): fprintf (graph_gnuplot, "sin");   break;
+            case (COS): fprintf (graph_gnuplot, "cos");   break;
+            case (TG):  fprintf (graph_gnuplot, "tan");   break;
+            case (CTG): fprintf (graph_gnuplot, "1/tan"); break;
+
+            case (LN): fprintf (graph_gnuplot, "log"); break;
+            
+            case (ARCSIN): fprintf (graph_gnuplot, "asin");          break;
+            case (ARCCOS): fprintf (graph_gnuplot, "acos");          break;
+            case (ARCTG):  fprintf (graph_gnuplot, "atan");          break;
+            case (ARCCTG): fprintf (graph_gnuplot, "(pi/2) - atan"); break;
+
+            case (SH):  fprintf (graph_gnuplot, "sinh");   break;
+            case (CH):  fprintf (graph_gnuplot, "cosh");   break;
+            case (TH):  fprintf (graph_gnuplot, "tanh");   break;
+            case (CTH): fprintf (graph_gnuplot, "1/tanh"); break;
+
+            case (ARCSH):  fprintf (graph_gnuplot, "asin");  break;
+            case (ARCCH):  fprintf (graph_gnuplot, "acosh"); break;
+            case (ARCTH):  fprintf (graph_gnuplot, "atanh"); break;
+
+            case (EXP): fprintf (graph_gnuplot, "exp"); break;
+
             default:
             {
 
@@ -990,11 +1012,29 @@ double calculate_knot (struct Knot* current_knot)
         case FUNCTION:
             switch (current_knot->function)
             {
-                case LN:  return     log(calculate_knot (current_knot->right));
-                case SIN: return     sin(calculate_knot (current_knot->right));
-                case COS: return     cos(calculate_knot (current_knot->right));
-                case TG:  return     tan(calculate_knot (current_knot->right));
-                case CTG: return 1 / tan(calculate_knot (current_knot->right));
+                case (SIN): return   sin(calculate_knot (current_knot->right));
+                case (COS): return   cos(calculate_knot (current_knot->right));
+                case (TG):  return   tan(calculate_knot (current_knot->right));
+                case (CTG): return 1/tan(calculate_knot (current_knot->right));
+
+                case (LN):  return   log(calculate_knot (current_knot->right));
+
+                case (ARCSIN): return          asin(calculate_knot (current_knot->right));
+                case (ARCCOS): return          acos(calculate_knot (current_knot->right));
+                case (ARCTG):  return          atan(calculate_knot (current_knot->right));
+                case (ARCCTG): return M_PI_2 - atan(calculate_knot (current_knot->right));
+
+                case (SH):  return   sinh(calculate_knot (current_knot->right));
+                case (CH):  return   cosh(calculate_knot (current_knot->right));
+                case (TH):  return   tanh(calculate_knot (current_knot->right));
+                case (CTH): return 1/tanh(calculate_knot (current_knot->right));
+
+                case (ARCSH):  return asinh(calculate_knot (current_knot->right));
+                case (ARCCH):  return acosh(calculate_knot (current_knot->right));
+                case (ARCTH):  return atanh(calculate_knot (current_knot->right));
+
+                case (EXP): return exp(calculate_knot (current_knot->right));
+
                 default:
                     break;
             }

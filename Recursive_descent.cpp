@@ -1,33 +1,30 @@
 #include "Recursive_descent.h"
 
-const char* str_all;
-
-Knot* GetG (const char* str)
+Knot* GetG (char** str)
 {
-    str_all = str;
-    pass_space ();
+    pass_space (str);
 
-    Knot* current_knot = GetE ();
+    Knot* current_knot = GetE (str);
 
-    pass_space ();
+    pass_space (str);
 
-    assert (*str_all == '\0');
+    assert (**str == '\0');
 
     return current_knot;
 }
 
-Knot* GetE ()
+Knot* GetE (char** str)
 {
-    pass_space ();
+    pass_space (str);
 
-    Knot* current_knot = GetT ();
+    Knot* current_knot = GetT (str);
 
-    while (*str_all == '+' || *str_all == '-')
+    while (**str == '+' || **str == '-')
     {
-        char op = *str_all;
-        str_all++;
+        char op = **str;
+        (*str)++;
 
-        Knot* value_knot = GetT ();
+        Knot* value_knot = GetT (str);
 
         Knot* operation_knot = knot_creater (nullptr, nullptr, nullptr, OPERATION);
         if (op == '+')
@@ -48,21 +45,21 @@ Knot* GetE ()
         current_knot = operation_knot;
     }
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
-Knot* GetT ()
+Knot* GetT (char** str)
 {
-    pass_space ();
-    Knot* current_knot = GetPow ();
+    pass_space (str);
+    Knot* current_knot = GetPow (str);
 
-    while (*str_all == '*' || *str_all == '/')
+    while (**str == '*' || **str == '/')
     {
-        char op = *str_all;
-        str_all++;
+        char op = **str;
+        (*str)++;
 
-        Knot* value_knot = GetPow ();
+        Knot* value_knot = GetPow (str);
 
         Knot* operation_knot = knot_creater (nullptr, nullptr, nullptr, OPERATION);
         if (op == '*')
@@ -83,21 +80,21 @@ Knot* GetT ()
         current_knot = operation_knot;
     }
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
-Knot* GetPow ()
+Knot* GetPow (char** str)
 {
-    pass_space ();
-    Knot* current_knot = GetP ();
+    pass_space (str);
+    Knot* current_knot = GetP (str);
 
-    while (*str_all == '^')
+    while (**str == '^')
     {
-        char op = *str_all;
-        str_all++;
+        char op = **str;
+        (*str)++;
 
-        Knot* indicator_degrees = GetP ();
+        Knot* indicator_degrees = GetP (str);
 
         Knot* operation_knot = knot_creater (nullptr, nullptr, nullptr, OPERATION);
         if (op == '^')
@@ -114,30 +111,30 @@ Knot* GetPow ()
         current_knot = operation_knot;
     }
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
-Knot* GetP ()
+Knot* GetP (char** str)
 {
-    pass_space ();
+    pass_space (str);
 
-    int unary_sign = is_unary_sign ();
+    int unary_sign = is_unary_sign (str);
 
     Knot* current_knot = nullptr;
 
-    if (*str_all == '(')
+    if (**str == '(')
     {
-        str_all++;
-        current_knot = GetE ();
+        (*str)++;
+        current_knot = GetE (str);
 
-        assert (*str_all == ')');
+        assert (**str == ')');
 
-        str_all++;
+        (*str)++;
     }
     else
     {
-        current_knot = GetFunc ();
+        current_knot = GetFunc (str);
     }
 
     if (unary_sign != 0)
@@ -156,21 +153,21 @@ Knot* GetP ()
         }
     }
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
-Knot* GetFunc ()
+Knot* GetFunc (char** str)
 {
-    pass_space ();
+    pass_space (str);
 
     Knot* current_knot = nullptr;
 
-    int math_func = is_math_func ();
+    int math_func = is_math_func (str);
 
     if (math_func != 0)
     {
-        current_knot = GetP ();
+        current_knot = GetP (str);
 
         Knot* function_knot = knot_creater (current_knot->prev, nullptr, current_knot, FUNCTION);
         current_knot->prev = function_knot;
@@ -216,202 +213,126 @@ Knot* GetFunc ()
     }
     else
     {
-        current_knot = GetConst ();
+        current_knot = GetV (str);
     }
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
-Knot* GetConst ()
+Knot* GetV (char** str)
 {
-    pass_space ();
-
-    Knot* current_knot = nullptr;
-    int math_const = is_math_const ();
-
-    if (math_const != 0)
-    {
-        current_knot = knot_creater (nullptr, nullptr, nullptr, CONST);
-        if (math_const == PI_CONST)
-        {
-            current_knot->const_val = PI_CONST;
-        }
-        else if (math_const == EXP_CONST)
-        {
-            current_knot->const_val = EXP_CONST;
-        }
-    }
-    else
-    {
-        current_knot = GetV ();
-    }
-
-    pass_space ();
-
-    return current_knot;
-}
-
-Knot* GetV ()
-{
-    pass_space ();
+    pass_space (str);
 
     Knot* current_knot = nullptr;
 
-    if (isdigit(*str_all) == 0)
+    if (isdigit(**str) == 0)
     {
         current_knot = knot_creater (nullptr, nullptr, nullptr, VARIABLE);
         current_knot->variable = (char*) calloc (MAX_LEN_STR, sizeof (char));
 
         int index = 0;
-        while (isalpha (*str_all) != 0)
+        while (isalpha (**str) != 0)
         {
-            *(current_knot->variable + index) = *str_all;
+            *(current_knot->variable + index) = **str;
 
             index++;
-            str_all++;
+            (*str)++;
         }
     }
     else
     {
-        current_knot = GetN();
+        current_knot = GetN(str);
     }
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
-Knot* GetN ()
+Knot* GetN (char** str)
 {
-    pass_space ();
+    pass_space (str);
     double value = 0;
 
     Knot* current_knot = knot_creater (nullptr, nullptr, nullptr, NUMBER);
 
-    const char* s_old = str_all;
-    while ('0' <= *str_all && *str_all <= '9')
+    const char* s_old = *str;
+    while ('0' <= **str && **str <= '9')
     {
-        value = value*10 + *str_all - '0';
-        str_all++;
+        value = value*10 + **str - '0';
+        (*str)++;
     }
-    assert (str_all != s_old);
+    assert (*str != s_old);
 
     current_knot->value = value;
 
-    pass_space ();
+    pass_space (str);
     return current_knot;
 }
 
 //==============================================
 
-int is_unary_sign ()
+int is_unary_sign (char** str)
 {
-    pass_space ();
+    pass_space (str);
 
-    if (*str_all == '-')
+    if (**str == '-')
     {
-        str_all++;
+        (*str)++;
         return UNARY_MINUS;
     }
-    else if (*str_all == '+')
+    else if (**str == '+')
     {
-        str_all++;
+        (*str)++;
         return UNARY_PLUS;
     }
 
-    pass_space ();
+    pass_space (str);
     return NO_UNARY_SIGN;
 }
 
-int is_math_func ()
+int is_math_func (char** str)
 {
     char math_func[250] = {0};
 
-    const char* str_old = str_all;
+    char* str_old = *str;
     int index = 0;
 
-    while (isalpha (*str_all) != 0)
+    while (isalpha (**str) != 0)
     {
-        math_func[index] = *str_all;
+        math_func[index] = **str;
 
         index++;
-        str_all++;
+        (*str)++;
     }
 
-    if (strcmp (math_func, "sin") == 0)
-    {
-        return SIN;
-    }
-    else if (strcmp (math_func, "cos") == 0)
-    {
-        return COS;
-    }
-    else if (strcmp (math_func, "tg") == 0)
-    {
-        return TG;
-    }
-    else if (strcmp (math_func, "ctg") == 0)
-    {
-        return CTG;
-    }
-    else if (strcmp (math_func, "arcsin") == 0)
-    {
-        return ARCSIN;
-    }
-    else if (strcmp (math_func, "arccos") == 0)
-    {
-        return ARCCOS;
-    }
-    else if (strcmp (math_func, "arctg") == 0)
-    {
-        return ARCTG;
-    }
-    else if (strcmp (math_func, "arcctg") == 0)
-    {
-        return ARCCTG;
-    }
-    else if (strcmp (math_func, "ln") == 0)
-    {
-        return LN;
-    }
+    IS_FUNCTION (math_func, SIN);
+    IS_FUNCTION (math_func, COS);
+    IS_FUNCTION (math_func, TG);
+    IS_FUNCTION (math_func, CTG);
+    IS_FUNCTION (math_func, ARCSIN);
+    IS_FUNCTION (math_func, ARCCOS);
+    IS_FUNCTION (math_func, ARCTG);
+    IS_FUNCTION (math_func, ARCCTG);
+    IS_FUNCTION (math_func, LN);
+    IS_FUNCTION (math_func, SH);
+    IS_FUNCTION (math_func, CH);
+    IS_FUNCTION (math_func, TH);
+    IS_FUNCTION (math_func, CTH);
+    IS_FUNCTION (math_func, ARCSH);
+    IS_FUNCTION (math_func, ARCCH);
+    IS_FUNCTION (math_func, ARCTH);
+    IS_FUNCTION (math_func, EXP);
 
-    str_all = str_old;
+    *str = str_old;
     return 0;
 }
 
-int is_math_const ()
+void pass_space (char** str)
 {
-    char math_const[250] = {0};
-
-    const char* str_old = str_all;
-    int index = 0;
-
-    while (isalpha (*str_all) != 0)
+    while (isspace (**str) != 0)
     {
-        math_const[index] = *str_all;
-
-        index++;
-        str_all++;
-    }
-
-    if (strcmp (math_const, "pi") == 0)
-    {
-        return PI_CONST;
-    }
-    else if (strcmp (math_const, "exp") == 0)
-    {
-        return EXP_CONST;
-    }
-
-    str_all = str_old;
-    return 0;
-}
-
-void pass_space ()
-{
-    while (isspace (*str_all) != 0)
-    {
-        str_all++;
+        (*str)++;
     }
 }
 

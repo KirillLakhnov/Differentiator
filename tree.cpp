@@ -15,7 +15,11 @@ void tree_ctor (struct Tree* tree)
         abort ();
     }
 
-    tree->root = GetG (tree->buffer_function->file_buffer);
+    char* file_buffer = tree->buffer_function->file_buffer;
+
+    tree->root = GetG (&tree->buffer_function->file_buffer);
+
+    tree->buffer_function->file_buffer = file_buffer;
 
     ASSERT_OK_TREE(tree);
 }
@@ -208,62 +212,28 @@ void knot_graph (struct Tree* tree, struct Knot* current_knot, FILE* tree_log_gr
         else if (current_knot->type == FUNCTION)
         {
             char function[MAX_LEN_CMD] = {0};
-            if (current_knot->function == SIN)
-            {
-                strcpy (function, "SIN");
-            }
-            else if (current_knot->function == COS)
-            {
-                strcpy (function, "COS");
-            }
-            else if (current_knot->function == TG)
-            {
-                strcpy (function, "TG");
-            }
-            else if (current_knot->function == CTG)
-            {
-                strcpy (function, "CTG");
-            }
-            else if (current_knot->function == ARCSIN)
-            {
-                strcpy (function, "ARCSIN");
-            }
-            else if (current_knot->function == ARCCOS)
-            {
-                strcpy (function, "ARCCOS");
-            }
-            else if (current_knot->function == ARCTG)
-            {
-                strcpy (function, "ARCTG");
-            }
-            else if (current_knot->function == ARCCTG)
-            {
-                strcpy (function, "ARCCTG");
-            }
-            else if (current_knot->function == LN)
-            {
-                strcpy (function, "LN");
-            }
+
+            KNOT_FUCK_STR(current_knot->function, SIN);
+            KNOT_FUCK_STR(current_knot->function, COS);
+            KNOT_FUCK_STR(current_knot->function, TG);
+            KNOT_FUCK_STR(current_knot->function, CTG);
+            KNOT_FUCK_STR(current_knot->function, ARCSIN);
+            KNOT_FUCK_STR(current_knot->function, ARCCOS);
+            KNOT_FUCK_STR(current_knot->function, ARCTG);
+            KNOT_FUCK_STR(current_knot->function, ARCCTG);
+            KNOT_FUCK_STR(current_knot->function, LN);
+            KNOT_FUCK_STR(current_knot->function, SH);
+            KNOT_FUCK_STR(current_knot->function, CH);
+            KNOT_FUCK_STR(current_knot->function, TH);
+            KNOT_FUCK_STR(current_knot->function, CTH);
+            KNOT_FUCK_STR(current_knot->function, ARCSH);
+            KNOT_FUCK_STR(current_knot->function, ARCCH);
+            KNOT_FUCK_STR(current_knot->function, ARCTH);
+            KNOT_FUCK_STR(current_knot->function, EXP);
 
             fprintf(tree_log_graph, "\t\"%p\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#ee9b52\","
 		                            "\n\t\tlabel = \"prev = %p \\lcurrent = %p | {<left> left = %p| %s | <right> right = %p}\"]\n", 
                                     current_knot, current_knot->prev, current_knot, current_knot->left, function, current_knot->right);
-        }
-        else if (current_knot->type == CONST)
-        {
-            char math_const[MAX_LEN_CMD] = {0};
-            if (current_knot->const_val == PI_CONST)
-            {
-                strcpy (math_const, "PI");
-            }
-            else if (current_knot->const_val == EXP_CONST)
-            {
-                strcpy (math_const, "EXP");
-            }
-
-            fprintf(tree_log_graph, "\t\"%p\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#ee9b52\","
-		                            "\n\t\tlabel = \"prev = %p \\lcurrent = %p | {<left> left = %p| %s | <right> right = %p}\"]\n", 
-                                    current_knot, current_knot->prev, current_knot, current_knot->left, math_const, current_knot->right);
         }
         else if (current_knot->type == VARIABLE)
         {
@@ -311,62 +281,27 @@ void knot_graph (struct Tree* tree, struct Knot* current_knot, FILE* tree_log_gr
         else if (current_knot->type == FUNCTION)
         {
             char function[MAX_LEN_CMD] = {0};
-            if (current_knot->function == SIN)
-            {
-                strcpy (function, "SIN");
-            }
-            else if (current_knot->function == COS)
-            {
-                strcpy (function, "COS");
-            }
-            else if (current_knot->function == TG)
-            {
-                strcpy (function, "TG");
-            }
-            else if (current_knot->function == CTG)
-            {
-                strcpy (function, "CTG");
-            }
-            else if (current_knot->function == ARCSIN)
-            {
-                strcpy (function, "ARCSIN");
-            }
-            else if (current_knot->function == ARCCOS)
-            {
-                strcpy (function, "ARCCOS");
-            }
-            else if (current_knot->function == ARCTG)
-            {
-                strcpy (function, "ARCTG");
-            }
-            else if (current_knot->function == ARCCTG)
-            {
-                strcpy (function, "ARCCTG");
-            }
-            else if (current_knot->function == LN)
-            {
-                strcpy (function, "LN");
-            }          
+            KNOT_FUCK_STR(current_knot->function, SIN);
+            KNOT_FUCK_STR(current_knot->function, COS);
+            KNOT_FUCK_STR(current_knot->function, TG);
+            KNOT_FUCK_STR(current_knot->function, CTG);
+            KNOT_FUCK_STR(current_knot->function, ARCSIN);
+            KNOT_FUCK_STR(current_knot->function, ARCCOS);
+            KNOT_FUCK_STR(current_knot->function, ARCTG);
+            KNOT_FUCK_STR(current_knot->function, ARCCTG);
+            KNOT_FUCK_STR(current_knot->function, LN);
+            KNOT_FUCK_STR(current_knot->function, SH);
+            KNOT_FUCK_STR(current_knot->function, CH);
+            KNOT_FUCK_STR(current_knot->function, TH);
+            KNOT_FUCK_STR(current_knot->function, CTH);
+            KNOT_FUCK_STR(current_knot->function, ARCSH);
+            KNOT_FUCK_STR(current_knot->function, ARCCH);
+            KNOT_FUCK_STR(current_knot->function, ARCTH);
+            KNOT_FUCK_STR(current_knot->function, EXP);         
 
             fprintf(tree_log_graph, "\t\"%p\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#87CEFA\","
 		                            "\n\t\tlabel = \"prev = %p \\lcurrent = %p | {<left> left = %p| %s | <right> right = %p}\"]\n", 
                                     current_knot, current_knot->prev, current_knot, current_knot->left, function, current_knot->right);
-        }
-        else if (current_knot->type == CONST)
-        {
-            char math_const[MAX_LEN_CMD] = {0};
-            if (current_knot->const_val == PI_CONST)
-            {
-                strcpy (math_const, "PI");
-            }
-            else if (current_knot->const_val == EXP_CONST)
-            {
-                strcpy (math_const, "EXP");
-            }
-
-            fprintf(tree_log_graph, "\t\"%p\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#87CEFA\","
-		                            "\n\t\tlabel = \"prev = %p \\lcurrent = %p | {<left> left = %p| %s | <right> right = %p}\"]\n", 
-                                    current_knot, current_knot->prev, current_knot, current_knot->left, math_const, current_knot->right);
         }
         else if (current_knot->type == VARIABLE)
         {
