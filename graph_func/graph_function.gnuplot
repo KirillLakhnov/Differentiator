@@ -1,6 +1,7 @@
 reset
 set grid
-set title "График вашей функции" font "Helvetica Bold, 20"
+set ylabel "y"
+set xlabel "x"
 set terminal png
 set output "graph_func/graph.png"
-plot (log(1+x))
+plot (exp(x))

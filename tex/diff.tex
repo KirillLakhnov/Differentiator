@@ -4,10 +4,23 @@
 \usepackage{indentfirst}
 \usepackage{misccorr}
 \usepackage{graphicx}
-\usepackage{amsmath}
+\usepackage{mathtools}
+\DeclareMathOperator{\arccosh}{arccosh}
+\DeclareMathOperator{\arcsinh}{arcsinh}
+\DeclareMathOperator{\arctanh}{arctanh}
+\DeclareMathOperator{\e}{e}
 \begin{document}
 
-\\\\Ваша изначальная функция: \\
-\\{${(ln{({1}+{x})})}$}
+\\\\\section{Ваша изначальная функция:} \\
+\begin{center}\\{${(\ln{({({x}+{y})}+{z})})}$}\end{center}
+\section{Производная функции по переменной x.}
+\\\\ \noindent \textbf1 производная изначальной функции:} \\
+\begin{center}\\{${(\frac{({({1}+{0})}+{0})}{({({x}+{y})}+{z})})}$}\end{center}
+\\\\ \noindent \textbf2 производная изначальной функции:} \\
+\begin{center}\\{${(\frac{1}{({({({x}+{y})}+{z})}^{2})})}$}\end{center}
+\\\\ \noindent \textbf3 производная изначальной функции:} \\
+\begin{center}\\{${(\frac{({2}*{({({({1}+{0})}+{0})}*{({({x}+{y})}+{z})})})}{({({({({x}+{y})}+{z})}^{2})}^{2})})}$}\end{center}
+\\\\ \noindent \textbf4 производная изначальной функции:} \\
+\begin{center}\\{${(\frac{({({({({0}*{({1}*{({({x}+{y})}+{z})})})}+{({({({0}*{({({x}+{y})}+{z})})}+{({({({1}+{0})}+{0})}*{1})})}*{2})})}*{({({({({x}+{y})}+{z})}^{2})}^{2})})}-{({({2}*{({({2}*{({({({1}+{0})}+{0})}*{({({x}+{y})}+{z})})})}*{({({({x}+{y})}+{z})}^{2})})})}*{({2}*{({({({1}+{0})}+{0})}*{({({x}+{y})}+{z})})})})})}{({({({({({x}+{y})}+{z})}^{2})}^{2})}^{2})})}$}\end{center}
 
 \end{document}

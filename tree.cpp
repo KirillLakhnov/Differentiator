@@ -7,6 +7,12 @@ void tree_ctor (struct Tree* tree)
     
     tree->size = 0;
     tree->code_error = 0;
+    tree->variable_number = 0;
+
+    for (int i = 0; i < MAX_NUMBER_VARIEBLE; i++)
+    {
+        tree->array_variable[i].variable_value = POISON_VALUE;
+    }
 
     if (BufferCreater (tree->file_function, tree->buffer_function) != GOOD_WORKING)
     {
@@ -17,7 +23,7 @@ void tree_ctor (struct Tree* tree)
 
     char* file_buffer = tree->buffer_function->file_buffer;
 
-    tree->root = GetG (&tree->buffer_function->file_buffer);
+    tree->root = GetG (&tree->buffer_function->file_buffer, tree);
 
     tree->buffer_function->file_buffer = file_buffer;
 
@@ -86,6 +92,39 @@ Knot* knot_creater (Knot* prev, Knot* left, Knot* right, enum TYPE type)
     return new_knot;
 }
 
+Knot* knot_op_creater (Knot* prev, Knot* left, Knot* right, enum OPERATION_TYPE OP)
+{
+    Knot* new_knot = knot_creater (prev, left, right, OPERATION);
+    new_knot->op_type = OP;
+
+    return new_knot;
+}
+
+Knot* knot_num_creater (Knot* prev, Knot* left, Knot* right, int value)
+{
+    Knot* new_knot = knot_creater (prev, left, right, NUMBER);
+    new_knot->value = value;  
+
+    return new_knot;
+}
+
+Knot* knot_func_creater (Knot* prev, Knot* left, Knot* right, enum MATH_FUNC FUNC)
+{
+    Knot* new_knot = knot_creater (prev, left, right, FUNCTION);
+    new_knot->function = FUNC;    
+
+    return new_knot;
+}
+
+Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable)
+{
+    Knot* new_knot = knot_creater (prev, left, right, VARIABLE);
+    new_knot->variable = (char*) calloc (MAX_LEN_STR, sizeof(char));
+    strcpy (new_knot->variable, variable);
+
+    return new_knot;
+}
+
 Knot* knot_clone (Knot* current_knot, Knot* prev)
 {
     Knot* copy_knot = knot_creater (prev, current_knot->left, current_knot->right, current_knot->type);
@@ -121,6 +160,24 @@ Tree* tree_clone (Knot* current_knot)
     tree_clone->root = all_knot_clone (current_knot);
 
     return tree_clone;
+}
+
+Tree* all_tree_clone (Tree* tree)
+{
+    Tree* tree_copy = tree_clone (tree->root);
+
+    tree_copy->tex             = tree->tex;
+    tree_copy->code_error      = tree->code_error;
+    tree_copy->variable_number = tree->variable_number;
+    tree_copy->size            = tree->size;
+
+    for (int i = 0; i < tree->variable_number; i++)
+    {
+        tree_copy->array_variable[i].variable_value = tree->array_variable[i].variable_value;
+        strcpy (tree_copy->array_variable[i].variable_name, tree->array_variable[i].variable_name);
+    }
+
+    return tree_copy;
 }
 
 Knot* all_knot_clone (Knot* current_knot)
@@ -213,23 +270,14 @@ void knot_graph (struct Tree* tree, struct Knot* current_knot, FILE* tree_log_gr
         {
             char function[MAX_LEN_CMD] = {0};
 
-            KNOT_FUCK_STR(current_knot->function, SIN);
-            KNOT_FUCK_STR(current_knot->function, COS);
-            KNOT_FUCK_STR(current_knot->function, TG);
-            KNOT_FUCK_STR(current_knot->function, CTG);
-            KNOT_FUCK_STR(current_knot->function, ARCSIN);
-            KNOT_FUCK_STR(current_knot->function, ARCCOS);
-            KNOT_FUCK_STR(current_knot->function, ARCTG);
-            KNOT_FUCK_STR(current_knot->function, ARCCTG);
-            KNOT_FUCK_STR(current_knot->function, LN);
-            KNOT_FUCK_STR(current_knot->function, SH);
-            KNOT_FUCK_STR(current_knot->function, CH);
-            KNOT_FUCK_STR(current_knot->function, TH);
-            KNOT_FUCK_STR(current_knot->function, CTH);
-            KNOT_FUCK_STR(current_knot->function, ARCSH);
-            KNOT_FUCK_STR(current_knot->function, ARCCH);
-            KNOT_FUCK_STR(current_knot->function, ARCTH);
-            KNOT_FUCK_STR(current_knot->function, EXP);
+            #define DEF_FUNC(FUNC, func_str, func_tex, ...) if (current_knot->function == FUNC)     \
+                                                            {                                       \
+                                                                strcpy (function, #FUNC);           \
+                                                            }
+
+            #include "code_generation.h"
+
+            #undef DEF_FUNC
 
             fprintf(tree_log_graph, "\t\"%p\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#ee9b52\","
 		                            "\n\t\tlabel = \"prev = %p \\lcurrent = %p | {<left> left = %p| %s | <right> right = %p}\"]\n", 
@@ -281,23 +329,15 @@ void knot_graph (struct Tree* tree, struct Knot* current_knot, FILE* tree_log_gr
         else if (current_knot->type == FUNCTION)
         {
             char function[MAX_LEN_CMD] = {0};
-            KNOT_FUCK_STR(current_knot->function, SIN);
-            KNOT_FUCK_STR(current_knot->function, COS);
-            KNOT_FUCK_STR(current_knot->function, TG);
-            KNOT_FUCK_STR(current_knot->function, CTG);
-            KNOT_FUCK_STR(current_knot->function, ARCSIN);
-            KNOT_FUCK_STR(current_knot->function, ARCCOS);
-            KNOT_FUCK_STR(current_knot->function, ARCTG);
-            KNOT_FUCK_STR(current_knot->function, ARCCTG);
-            KNOT_FUCK_STR(current_knot->function, LN);
-            KNOT_FUCK_STR(current_knot->function, SH);
-            KNOT_FUCK_STR(current_knot->function, CH);
-            KNOT_FUCK_STR(current_knot->function, TH);
-            KNOT_FUCK_STR(current_knot->function, CTH);
-            KNOT_FUCK_STR(current_knot->function, ARCSH);
-            KNOT_FUCK_STR(current_knot->function, ARCCH);
-            KNOT_FUCK_STR(current_knot->function, ARCTH);
-            KNOT_FUCK_STR(current_knot->function, EXP);         
+
+            #define DEF_FUNC(FUNC, func_str, func_tex, ...) if (current_knot->function == FUNC)     \
+                                                            {                                       \
+                                                                strcpy (function, #FUNC);           \
+                                                            }
+
+            #include "code_generation.h"
+
+            #undef DEF_FUNC       
 
             fprintf(tree_log_graph, "\t\"%p\" [shape = \"record\", style = \"rounded, filled\", fontname = \"Helvetica-Bold\", fillcolor = \"#87CEFA\","
 		                            "\n\t\tlabel = \"prev = %p \\lcurrent = %p | {<left> left = %p| %s | <right> right = %p}\"]\n", 

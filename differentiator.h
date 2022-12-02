@@ -15,12 +15,14 @@
 #include "tree.h"
 #include "Recursive_descent.h"
 #include "libraries/stack.h"
+#include "DSL.h"
 
 #define RED_TEXT(text) "\e[31m" #text "\e[0m"
 
 #define TEX_TEXT_PRINT(tree_tex, tree, ...)     char tex_text[MAX_LEN_CMD] = "";                                    \
                                                 snprintf (tex_text, MAX_LEN_CMD, __VA_ARGS__);                      \
-                                                tex_tree_print (tree_tex, tree, tex_text);
+                                                tex_tree_print (tree_tex, tree, tex_text);                          
+                                                
 
 
 const size_t MAX_STR_SIZE = 250;
@@ -34,7 +36,6 @@ enum COMMAND {
     COMMAND_6 = 54,
     COMMAND_7 = 55,
     COMMAND_8 = 56,
-    COMMAND_9 = 57,
 };
 
 void start_programm (struct Tree* tree);
@@ -45,41 +46,53 @@ void processing_selected_mode (struct Tree* tree);
 
 //---------------------------------------------------------------------------------
 
-void menu_value_function_at_point (struct Tree* tree);
+void menu_value_function_at_point (struct Tree* tree, int operating_mode);
 
-Tree* value_function_at_point_counter (struct Tree* tree, double point_value);
+void processing_selected_value_at_point_mode (struct Tree* tree, int counter);
 
-//---------------------------------------------------------------------------------
-
-void menu_derivative (struct Tree* tree);
-
-void processing_selected_derivative_mode (struct Tree* tree);
-
-Knot* derivative (struct Knot* current_knot);
+Tree* value_function_at_point_counter (struct Tree* tree, struct Variable variable);
 
 //---------------------------------------------------------------------------------
 
-void menu_maclaurin_decomposition (struct Tree* tree);
+void menu_derivative (struct Tree* tree, int operating_mode);
 
-void maclaurin_decomposition (struct Tree* tree, int order);
+void sub_menu_derivative (struct Tree* tree, int number_variable, int operating_mode);
 
-//---------------------------------------------------------------------------------
+void processing_selected_derivative_mode (struct Tree* tree, struct Tree* tree_copy, int number, int number_variable, int operating_mode);
 
-//---------------------------------------------------------------------------------
-
-void menu_tangent_equation (struct Tree* tree);
-
-void tangent_equation_at_point (struct Tree* tree, double point_value);
+Knot* derivative (struct Tree* tree, struct Knot* current_knot, int number_variable);
 
 //---------------------------------------------------------------------------------
 
-void menu_graph_function (struct Tree* tree);
+void menu_taylor_decomposition (struct Tree* tree, int operating_mode);
+
+void sub_menu_taylor_decomposition (struct Tree* tree, int number_variable, int operating_mode);
+
+void taylor_decomposition (struct Tree* tree, int order, double point, int number_variable);
+
+//---------------------------------------------------------------------------------
+
+void menu_tangent_equation (struct Tree* tree, int operating_mode);
+
+void sub_menu_tangent_equation (struct Tree* tree, int number_variable, int operating_mode);
+
+void tangent_equation_at_point (struct Tree* tree, double point_value, int number_vatiable);
+
+//---------------------------------------------------------------------------------
+
+void menu_graph_function (struct Tree* tree, int operating_mode);
 
 void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnuplot);
 
 void tree_print_file (struct Knot* knot, FILE* graph_gnuplot);
 
 //---------------------------------------------------------------------------------
+
+void menu_full_function_study (struct Tree* tree);
+
+//---------------------------------------------------------------------------------
+
+int find_variable (struct Tree* tree, char* variable);
 
 int get_command ();
 
@@ -97,13 +110,13 @@ void relinking_subtree(struct Tree* tree, struct Knot* current_knot, struct Knot
 
 int type_knot (struct Knot* current_knot);
 
-double calculate_knot (struct Knot* current_knot);
+double calculate_knot (struct Tree* tree, struct Knot* current_knot);
 
 //---------------------------------------------------------------------------------
 
-struct Stack* tree_search_varieble (struct Knot* current_knot);
+struct Stack* tree_search_variable (struct Knot* current_knot, struct Variable variable);
 
-int knot_varieble_search (struct Knot* current_knot, struct Stack* path_element);
+int knot_variable_search (struct Knot* current_knot, struct Stack* path_element, struct Variable variable);
 
 //---------------------------------------------------------------------------------
 

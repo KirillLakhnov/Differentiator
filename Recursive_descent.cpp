@@ -1,10 +1,10 @@
 #include "Recursive_descent.h"
 
-Knot* GetG (char** str)
+Knot* GetG (char** str, struct Tree* tree)
 {
     pass_space (str);
 
-    Knot* current_knot = GetE (str);
+    Knot* current_knot = GetE (str, tree);
 
     pass_space (str);
 
@@ -13,18 +13,18 @@ Knot* GetG (char** str)
     return current_knot;
 }
 
-Knot* GetE (char** str)
+Knot* GetE (char** str, struct Tree* tree)
 {
     pass_space (str);
 
-    Knot* current_knot = GetT (str);
+    Knot* current_knot = GetT (str, tree);
 
     while (**str == '+' || **str == '-')
     {
         char op = **str;
         (*str)++;
 
-        Knot* value_knot = GetT (str);
+        Knot* value_knot = GetT (str, tree);
 
         Knot* operation_knot = knot_creater (nullptr, nullptr, nullptr, OPERATION);
         if (op == '+')
@@ -49,17 +49,17 @@ Knot* GetE (char** str)
     return current_knot;
 }
 
-Knot* GetT (char** str)
+Knot* GetT (char** str, struct Tree* tree)
 {
     pass_space (str);
-    Knot* current_knot = GetPow (str);
+    Knot* current_knot = GetPow (str, tree);
 
     while (**str == '*' || **str == '/')
     {
         char op = **str;
         (*str)++;
 
-        Knot* value_knot = GetPow (str);
+        Knot* value_knot = GetPow (str, tree);
 
         Knot* operation_knot = knot_creater (nullptr, nullptr, nullptr, OPERATION);
         if (op == '*')
@@ -84,17 +84,17 @@ Knot* GetT (char** str)
     return current_knot;
 }
 
-Knot* GetPow (char** str)
+Knot* GetPow (char** str, struct Tree* tree)
 {
     pass_space (str);
-    Knot* current_knot = GetP (str);
+    Knot* current_knot = GetP (str, tree);
 
     while (**str == '^')
     {
         char op = **str;
         (*str)++;
 
-        Knot* indicator_degrees = GetP (str);
+        Knot* indicator_degrees = GetP (str, tree);
 
         Knot* operation_knot = knot_creater (nullptr, nullptr, nullptr, OPERATION);
         if (op == '^')
@@ -115,7 +115,7 @@ Knot* GetPow (char** str)
     return current_knot;
 }
 
-Knot* GetP (char** str)
+Knot* GetP (char** str, struct Tree* tree)
 {
     pass_space (str);
 
@@ -126,7 +126,7 @@ Knot* GetP (char** str)
     if (**str == '(')
     {
         (*str)++;
-        current_knot = GetE (str);
+        current_knot = GetE (str, tree);
 
         assert (**str == ')');
 
@@ -134,7 +134,7 @@ Knot* GetP (char** str)
     }
     else
     {
-        current_knot = GetFunc (str);
+        current_knot = GetFunc (str, tree);
     }
 
     if (unary_sign != 0)
@@ -157,7 +157,7 @@ Knot* GetP (char** str)
     return current_knot;
 }
 
-Knot* GetFunc (char** str)
+Knot* GetFunc (char** str, struct Tree* tree)
 {
     pass_space (str);
 
@@ -167,60 +167,35 @@ Knot* GetFunc (char** str)
 
     if (math_func != 0)
     {
-        current_knot = GetP (str);
+        current_knot = GetP (str, tree);
 
         Knot* function_knot = knot_creater (current_knot->prev, nullptr, current_knot, FUNCTION);
         current_knot->prev = function_knot;
         
-        if (math_func == SIN)
+        switch (math_func)
         {
-            function_knot->function = SIN;
-        }
-        else if (math_func == COS)
-        {
-            function_knot->function = COS;
-        }
-        else if (math_func == TG)
-        {
-            function_knot->function = TG;
-        }
-        else if (math_func == CTG)
-        {
-            function_knot->function = CTG;
-        }
-        else if (math_func == ARCSIN)
-        {
-            function_knot->function = ARCSIN;
-        }
-        else if (math_func == ARCCOS)
-        {
-            function_knot->function = ARCCOS;
-        }
-        else if (math_func == ARCTG)
-        {
-            function_knot->function = ARCTG;
-        }
-        else if (math_func == ARCCTG)
-        {
-            function_knot->function = ARCCTG;
-        }
-        else if (math_func == LN)
-        {
-            function_knot->function = LN;
+            #define DEF_FUNC(FUNC, func, func_tex, ...) case (FUNC): function_knot->function = FUNC; break;
+
+            #include "code_generation.h"
+
+            #undef DEF_FUNC
+
+            default: 
+                break;
         }
 
         current_knot = function_knot;
     }
     else
     {
-        current_knot = GetV (str);
+        current_knot = GetV (str, tree);
     }
 
     pass_space (str);
     return current_knot;
 }
 
-Knot* GetV (char** str)
+Knot* GetV (char** str, struct Tree* tree)
 {
     pass_space (str);
 
@@ -238,18 +213,21 @@ Knot* GetV (char** str)
 
             index++;
             (*str)++;
-        }
+        } 
+
+        strcpy (tree->array_variable[tree->variable_number].variable_name, current_knot->variable);
+        tree->variable_number++;
     }
     else
     {
-        current_knot = GetN(str);
+        current_knot = GetN (str, tree);
     }
 
     pass_space (str);
     return current_knot;
 }
 
-Knot* GetN (char** str)
+Knot* GetN (char** str, struct Tree* tree)
 {
     pass_space (str);
     double value = 0;
@@ -306,23 +284,14 @@ int is_math_func (char** str)
         (*str)++;
     }
 
-    IS_FUNCTION (math_func, SIN);
-    IS_FUNCTION (math_func, COS);
-    IS_FUNCTION (math_func, TG);
-    IS_FUNCTION (math_func, CTG);
-    IS_FUNCTION (math_func, ARCSIN);
-    IS_FUNCTION (math_func, ARCCOS);
-    IS_FUNCTION (math_func, ARCTG);
-    IS_FUNCTION (math_func, ARCCTG);
-    IS_FUNCTION (math_func, LN);
-    IS_FUNCTION (math_func, SH);
-    IS_FUNCTION (math_func, CH);
-    IS_FUNCTION (math_func, TH);
-    IS_FUNCTION (math_func, CTH);
-    IS_FUNCTION (math_func, ARCSH);
-    IS_FUNCTION (math_func, ARCCH);
-    IS_FUNCTION (math_func, ARCTH);
-    IS_FUNCTION (math_func, EXP);
+    #define DEF_FUNC(FUNC, func, func_tex, ...) if (stricmp (math_func, #FUNC) == 0)    \
+                                                {                                       \
+                                                    return FUNC;                        \
+                                                }
+
+    #include "code_generation.h"
+
+    #undef DEF_FUNC
 
     *str = str_old;
     return 0;

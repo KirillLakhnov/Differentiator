@@ -27,16 +27,14 @@
 
 #else
 #define ASSERT_OK(tree)
-#endif
+#endif                        
 
-#define KNOT_FUCK_STR(knot_func, func)  if (knot_func == func)          \
-                                        {                               \
-                                            strcpy (function, #func);   \
-                                        }                           
-
+const double POISON_VALUE = NAN;
 const size_t MAX_LEN_STR = 300;
 const size_t DTOR_SIZE_T = 0xBABADEDA;
 const int DTOR_INT = 0xBABADEAD;
+
+const size_t MAX_NUMBER_VARIEBLE = 50;
 
 enum TREE_ERROR
 {
@@ -74,28 +72,33 @@ enum MATH_CONST {
 };
 
 enum MATH_FUNC {
-    SIN = 1,
+    SIN = 1, 
     COS = 2,
-    CTG = 3,
-    TG  = 4,
+    TG  = 3,
     
-    ARCSIN = 5,
-    ARCCOS = 6,
-    ARCCTG = 7,
-    ARCTG  = 8,
+    ARCSIN = 4,
+    ARCCOS = 5,
+    ARCTG  = 6,
 
-    LN = 9,
+    LN = 7,
 
-    SH  = 10,
-    CH  = 11,
-    TH  = 12,
-    CTH = 13,
+    SH  = 8,
+    CH  = 9,    
+    TH  = 10,   
 
-    ARCSH  = 14,
-    ARCCH  = 15,
-    ARCTH  = 16,
+    ARCSH  = 11,
+    ARCCH  = 12,
+    ARCTH  = 13,
 
-    EXP = 17,
+    EXP = 14, 
+
+    SQRT = 15,
+};
+
+struct Variable
+{
+    char variable_name[MAX_LEN_STR];
+    double variable_value;
 };
 
 struct Knot
@@ -112,7 +115,6 @@ struct Knot
         char* variable;
         enum MATH_FUNC function;
         enum OPERATION_TYPE op_type;
-        enum MATH_CONST const_val;
     };
 };
 
@@ -127,6 +129,9 @@ struct Tree
     size_t code_error;
 
     FILE* tex;
+
+    struct Variable array_variable [MAX_NUMBER_VARIEBLE];
+    size_t variable_number;
 };
 
 void tree_ctor (struct Tree* tree);
@@ -135,11 +140,21 @@ void tree_dtor (struct Tree* tree);
 
 void knot_dtor (struct Knot* current_knot);
 
-Knot* knot_creater (Knot* prev, Knot* left, Knot* right, enum TYPE type);
+Knot* knot_creater (Knot* prev, Knot* left, Knot* right, enum TYPE TYPE);
+
+Knot* knot_op_creater (Knot* prev, Knot* left, Knot* right, enum OPERATION_TYPE OP);
+
+Knot* knot_num_creater (Knot* prev, Knot* left, Knot* right, int value);
+
+Knot* knot_func_creater (Knot* prev, Knot* left, Knot* right, enum MATH_FUNC FUNC);
+
+Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable);
 
 Knot* knot_clone (Knot* current_knot, Knot* prev);
 
 Tree* tree_clone (Knot* current_knot);
+
+Tree* all_tree_clone (Tree* tree);
 
 Knot* all_knot_clone (Knot* current_knot);
 

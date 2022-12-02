@@ -8,12 +8,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#include "tree.h"
-
-#define IS_FUNCTION(math_func, func)    if (stricmp (math_func, #func) == 0)    \
-                                        {                                       \
-                                            return func;                        \
-                                        }                                       
+#include "tree.h"                                     
                                         
 enum UNARY_SIGN {
     UNARY_PLUS    = 1,
@@ -21,21 +16,21 @@ enum UNARY_SIGN {
     NO_UNARY_SIGN = 3,
 };
 
-Knot* GetG (char** str);
+Knot* GetG (char** str, struct Tree* tree);
 
-Knot* GetE (char** str);
+Knot* GetE (char** str, struct Tree* tree);
 
-Knot* GetT (char** str);
+Knot* GetT (char** str, struct Tree* tree);
 
-Knot* GetPow (char** str);
+Knot* GetPow (char** str, struct Tree* tree);
 
-Knot* GetP (char** str);
+Knot* GetP (char** str, struct Tree* tree);
 
-Knot* GetFunc (char** str);
+Knot* GetFunc (char** str, struct Tree* tree);
 
-Knot* GetN (char** str);
+Knot* GetN (char** str, struct Tree* tree);
 
-Knot* GetV (char** str);
+Knot* GetV (char** str, struct Tree* tree);
 
 //==============================================
 
