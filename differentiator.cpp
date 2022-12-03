@@ -2,16 +2,20 @@
 
 void start_programm (struct Tree* tree)
 {
+    assert (tree);
+
     tree_ctor (tree);
     simplification_tree (tree, tree->root);
 
-    TEX_TEXT_PRINT(tree->tex, tree, "\\\\\\\\\\section{Ваша изначальная функция:} \\\\");
+    TEX_TEXT_PRINT (tree->tex, ALL_NAME, -1, tree, "\\section{Ваша изначальная функция:} \n \\begin{equation} f(");
 
     main_menu (tree);
 }
 
 void main_menu (struct Tree* tree)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     printf ("Выберите, что хотите сделать с функцией, записанной в файле?\n");
@@ -30,29 +34,31 @@ void main_menu (struct Tree* tree)
 
 void processing_selected_mode (struct Tree* tree)
 {
+    ASSERT_OK_TREE (tree);
+
     int mode = get_command();
 
     switch (mode)
     {
         case COMMAND_1:  
             screen_clear ();
-            menu_value_function_at_point (tree, 1);
+            menu_value_function_at_point (tree, FROM_MAIN_MENU, FROM_MAIN_MENU);
             break;
         case COMMAND_2: 
             screen_clear (); 
-            menu_derivative (tree, 1);
+            menu_derivative (tree, FROM_MAIN_MENU);
             break;
         case COMMAND_3:
             screen_clear ();
-            menu_taylor_decomposition (tree, 1);
+            menu_taylor_decomposition (tree, FROM_MAIN_MENU);
             break;
         case COMMAND_4:
             screen_clear ();
-            menu_tangent_equation (tree, 1);
+            menu_tangent_equation (tree, FROM_MAIN_MENU);
             break;
         case COMMAND_5:
             screen_clear ();
-            menu_graph_function (tree, 1);
+            menu_graph_function (tree, FROM_MAIN_MENU);
             break;
         case COMMAND_6:
             menu_full_function_study (tree);
@@ -77,15 +83,17 @@ void processing_selected_mode (struct Tree* tree)
 
 //---------------------------------------------------------------------------------
 
-void menu_value_function_at_point (struct Tree* tree, int operating_mode)
+void menu_value_function_at_point (struct Tree* tree, int operating_mode, int operating_mode_point_value)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     double point_value = 0;
 
     Tree* tree_copy = all_tree_clone (tree);
 
-    for (int i = 0; i < tree->variable_number; i++)
+    for (int i = 0; i < tree_copy->variable_number; i++)
     {
         screen_clear ();
 
@@ -94,49 +102,56 @@ void menu_value_function_at_point (struct Tree* tree, int operating_mode)
         printf ("[" RED_TEXT(1) "] Да\n");
         printf ("[" RED_TEXT(2) "] Нет\n");
 
-        processing_selected_value_at_point_mode (tree, i);
-
-        clear_input ();
+        processing_selected_value_at_point_mode (tree_copy, i);
     }
 
-    for (int i = 0; i < tree->variable_number; i++)
+    for (int i = 0; i < tree_copy->variable_number; i++)
     {
-        if (!(tree->array_variable[i].variable_value != tree->array_variable[i].variable_value))
+        if (!(tree_copy->array_variable[i].variable_value != tree_copy->array_variable[i].variable_value))
         {
-            tree_copy = value_function_at_point_counter (tree_copy, tree->array_variable[i]);
+            tree_copy = value_function_at_point_counter (tree_copy, tree_copy->array_variable[i]);
         }
     }
 
-    fprintf (tree->tex, "\n\\section{Значение функции в точке.}");
-    fprintf (tree->tex, "\n\\\\\\\\ \\noindent \\textbf {Значения переменных при рассчете значения функции:}\n");
+    if (operating_mode_point_value == FROM_MAIN_MENU)
+    {
+        fprintf (tree->tex, "\n\\section{Значение функции в точке.}");
+    }
+
+    fprintf (tree->tex, "\n\\noindent \\textbf {Значения переменных при рассчете значения функции:}\n");
     fprintf (tree->tex, "\\begin{enumerate}\n");
 
-    for (int i = 0; i < tree->variable_number; i++)
+    for (int i = 0; i < tree_copy->variable_number; i++)
     {
-        if (!(tree->array_variable[i].variable_value != tree->array_variable[i].variable_value))
+        if (!(tree_copy->array_variable[i].variable_value != tree_copy->array_variable[i].variable_value))
         {
-            char* var_name = tree->array_variable[i].variable_name;
-            double var_value = tree->array_variable[i].variable_value;
+            char* var_name = tree_copy->array_variable[i].variable_name;
+            double var_value = tree_copy->array_variable[i].variable_value;
 
-            fprintf (tree->tex, "\t\\item %s = %lf\n",  var_name,
-                                                        var_value == (int)var_value ? (int)var_value : var_value);
+            fprintf (tree->tex, "\t\\item %s = %lf\n", var_name, var_value);
         }
     }
 
     fprintf (tree->tex, "\\end{enumerate}\n");
 
-    TEX_TEXT_PRINT(tree->tex, tree_copy, "\\noindent \\textbf {Значение функции в заданной точке:}\\\\");
+    TEX_TEXT_PRINT(tree->tex, ONLY_WITH_VAL, -1, tree_copy, "\\noindent \\textbf {Значение функции в заданной точке:}\n \\begin{equation} f(");
 
     tree_dtor (tree_copy);
 
-    if (operating_mode == 1)
+    if (operating_mode == FROM_MAIN_MENU)
     {
         main_menu (tree);
+    }
+    else
+    {
+        ASSERT_OK_TREE (tree);
     }
 }
 
 void processing_selected_value_at_point_mode (struct Tree* tree, int counter)
 {
+    ASSERT_OK_TREE (tree);
+
     int mode = get_command();
 
     switch (mode)
@@ -145,6 +160,7 @@ void processing_selected_value_at_point_mode (struct Tree* tree, int counter)
             screen_clear ();
             printf ("Введите значение переменной \"%s\": ", tree->array_variable[counter].variable_name);
             scanf ("%lf", &tree->array_variable[counter].variable_value);
+            clear_input ();
             break;
         case COMMAND_2: 
             break;
@@ -152,11 +168,15 @@ void processing_selected_value_at_point_mode (struct Tree* tree, int counter)
             printf("Неверный режим %c, попробуй еще раз\n", mode);
             processing_selected_value_at_point_mode (tree, counter);
     }
+    
+    ASSERT_OK_TREE (tree);
 }
 
 Tree* value_function_at_point_counter (struct Tree* tree, struct Variable variable)
 {
-    Tree* tree_copy = tree_clone (tree->root);
+    ASSERT_OK_TREE (tree);
+
+    Tree* tree_copy = all_tree_clone (tree);
 
     Stack* find_varieble = tree_search_variable (tree_copy->root, variable);
 
@@ -179,6 +199,8 @@ Tree* value_function_at_point_counter (struct Tree* tree, struct Variable variab
 
     simplification_tree (tree_copy, tree_copy->root);
 
+    ASSERT_OK_TREE (tree);
+
     return tree_copy;
 }
 
@@ -186,6 +208,8 @@ Tree* value_function_at_point_counter (struct Tree* tree, struct Variable variab
 
 void menu_derivative (struct Tree* tree, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     int number_variable = 0;
@@ -214,10 +238,14 @@ void menu_derivative (struct Tree* tree, int operating_mode)
     {
         sub_menu_derivative (tree, number_variable, operating_mode);
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void sub_menu_derivative (struct Tree* tree, int number_variable, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     printf ("Производную какого порядка вы хотите посчитать? ");
@@ -234,7 +262,7 @@ void sub_menu_derivative (struct Tree* tree, int number_variable, int operating_
         tree_copy->root = derivative (tree_copy, tree_copy->root, number_variable);
         simplification_tree (tree_copy, tree_copy->root);
 
-        TEX_TEXT_PRINT(tree->tex, tree_copy, "\\\\\\\\ \\noindent \\textbf%d производная изначальной функции:} \\\\", i);
+        TEX_TEXT_PRINT(tree->tex, ONE_VAR, number_variable, tree_copy, "\\noindent \\textbf {%d производная изначальной функции:}\n \\begin{equation} f^{(%d)}(", i, i);
     }
 
     clear_input ();
@@ -246,10 +274,14 @@ void sub_menu_derivative (struct Tree* tree, int number_variable, int operating_
     printf ("[" RED_TEXT(2) "] Нет\n");
 
     processing_selected_derivative_mode (tree, tree_copy, num, number_variable, operating_mode);
+
+    ASSERT_OK_TREE (tree);
 }
 
 void processing_selected_derivative_mode (struct Tree* tree, struct Tree* tree_copy, int number, int number_variable, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     int mode = get_command();
 
     switch (mode)
@@ -257,14 +289,18 @@ void processing_selected_derivative_mode (struct Tree* tree, struct Tree* tree_c
         case COMMAND_1:  
             screen_clear ();
             fprintf (tree->tex, "\n\\section{Значение %d производной функции по переменной %s.}", number, tree->array_variable[number_variable].variable_name);
-            menu_value_function_at_point (tree_copy, operating_mode);
+            menu_value_function_at_point (tree_copy, operating_mode, FROM_FULL_STUDY_OR_DIFF);
             break;
         case COMMAND_2: 
             screen_clear ();
             tree_dtor (tree_copy); 
-            if (operating_mode == 1)
+            if (operating_mode == FROM_MAIN_MENU)
             {
                 main_menu (tree);
+            }
+            else
+            {
+                ASSERT_OK_TREE (tree);
             }
             break;
         default: 
@@ -275,6 +311,8 @@ void processing_selected_derivative_mode (struct Tree* tree, struct Tree* tree_c
 
 Knot* derivative (struct Tree* tree, struct Knot* current_knot, int number_variable)
 {
+    ASSERT_OK_TREE (tree);
+
     Tree* tree_copy = tree_clone (KNOT);
 
     if (LKNOT != nullptr && RKNOT != nullptr)
@@ -430,17 +468,17 @@ Knot* derivative (struct Tree* tree, struct Knot* current_knot, int number_varia
                 #undef DEF_FUNC
 
                 default:
-                {
-
-                }
+                    tree->code_error |= TREE_ERROR_SYNTAX_IN_TREE;
+                    ASSERT_OK_TREE (tree);
             }
             break;
         }
         default:
-        {
-
-        }
+            tree->code_error |= TREE_ERROR_SYNTAX_IN_TREE;
+            ASSERT_OK_TREE (tree);
     }
+
+    ASSERT_OK_TREE (tree);
 
     return KNOT;
 }
@@ -449,6 +487,8 @@ Knot* derivative (struct Tree* tree, struct Knot* current_knot, int number_varia
 
 void menu_taylor_decomposition (struct Tree* tree, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     int number_variable = 0;
 
     if (tree->variable_number > 1)
@@ -475,10 +515,14 @@ void menu_taylor_decomposition (struct Tree* tree, int operating_mode)
     {
         sub_menu_taylor_decomposition (tree, number_variable, operating_mode);
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void sub_menu_taylor_decomposition (struct Tree* tree, int number_variable, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     double point = 0;
     int    order = 0;
 
@@ -498,21 +542,21 @@ void sub_menu_taylor_decomposition (struct Tree* tree, int number_variable, int 
 
     simplification_tree (tree, tree->root);
 
-    fprintf (tree->tex, "\n \\\\\\\\ \\section{Разложение вашей функции по Тейлору до %d порядка в окрестности точки ", order);
+    fprintf (tree->tex, "\n \\section{Разложение вашей функции по Тейлору до %d порядка в окрестности точки ", order);
 
     if (point == (int)point)
     {
-        fprintf (tree->tex, "%d:} \\\\ \n", (int)point);
+        fprintf (tree->tex, "%d:}\n", (int)point);
     }
     else
     {
-        fprintf (tree->tex, "%lf:} \\\\ \n", point);
+        fprintf (tree->tex, "%lf:}\n", point);
     }
 
-    fprintf (tree->tex, "\\begin{center}");
-    fprintf (tree->tex, "\\\\{$");
+    fprintf (tree->tex, "\\begin{equation}");
+    fprintf (tree->tex, "f(%s) = {", tree->array_variable[number_variable].variable_name);
     tree_print (tree->tex, tree->root);
-    fprintf (tree->tex, "$}");
+    fprintf (tree->tex, "}");
     
     if (point == 0)
     {
@@ -527,16 +571,20 @@ void sub_menu_taylor_decomposition (struct Tree* tree, int number_variable, int 
         fprintf (tree->tex, "+ {o({(%s - %lf)}^{%d})}", tree->array_variable[number_variable].variable_name, point, order);
     }
 
-    fprintf (tree->tex, "\\end{center}");
+    fprintf (tree->tex, "\\end{equation}");
 
     if (operating_mode == 1)
     {
         main_menu (tree);
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void taylor_decomposition (struct Tree* tree, int order, double point, int number_variable)
 {
+    ASSERT_OK_TREE (tree);
+
     Tree* tree_copy = tree_clone (tree->root);
 
     tree->array_variable[number_variable].variable_value = point;
@@ -581,11 +629,15 @@ void taylor_decomposition (struct Tree* tree, int order, double point, int numbe
     }
 
     tree_dtor (tree_copy);
+
+    ASSERT_OK_TREE (tree);
 }
 //---------------------------------------------------------------------------------
 
 void menu_tangent_equation (struct Tree* tree, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     int number_variable = 0;
@@ -614,10 +666,14 @@ void menu_tangent_equation (struct Tree* tree, int operating_mode)
     {
         sub_menu_tangent_equation (tree, number_variable, operating_mode);
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void sub_menu_tangent_equation (struct Tree* tree, int number_variable, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     double point_value = 0;
@@ -631,21 +687,25 @@ void sub_menu_tangent_equation (struct Tree* tree, int number_variable, int oper
 
     if (point_value == (int)point_value)
     {
-        TEX_TEXT_PRINT (tree->tex, tree, "\\\\\\\\ \\section{Уравнение касательная к вашей функции в точке %d:} \\\\ \n", (int)point_value);
+        TEX_TEXT_PRINT (tree->tex, ONE_VAR, number_variable, tree, "\\section{Уравнение касательная к вашей функции в точке %d:}\n \\begin{equation} f_{\\tangent}(", (int)point_value);
     }
     else
     {
-        TEX_TEXT_PRINT (tree->tex, tree, "\\\\\\\\ \\section{Уравнение касательная к вашей функции в точке %lf:} \\\\ \n", point_value);
+        TEX_TEXT_PRINT (tree->tex, ONE_VAR, number_variable, tree, "\\section{Уравнение касательная к вашей функции в точке %lf:}\n \\begin{equation} f_{\\tangent}(", point_value);
     }
 
     if (operating_mode == 1)
     {
         main_menu (tree);
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void tangent_equation_at_point (struct Tree* tree, double point_value, int number_variable)
 {
+    ASSERT_OK_TREE (tree);
+
     tree->array_variable[number_variable].variable_value = 3;
 
     Tree* tree_value_point = value_function_at_point_counter (tree, tree->array_variable[number_variable]);
@@ -672,12 +732,25 @@ void tangent_equation_at_point (struct Tree* tree, double point_value, int numbe
     tree->root = add_knot;
 
     simplification_tree (tree, tree->root);
+
+    ASSERT_OK_TREE (tree);
 }
 
 //---------------------------------------------------------------------------------
 
 void menu_graph_function (struct Tree* tree, int operating_mode)
 {
+    ASSERT_OK_TREE (tree);
+
+    if (tree->variable_number > 1)
+    {
+        printf ("У вашей функции больше 1 переменной, не получится построить график(((\n");
+        if (operating_mode == 1)
+        {
+            main_menu (tree);
+        }
+        return;
+    }
     screen_clear ();
 
     FILE* graph_gnuplot = fopen ("graph_func/graph_function.gnuplot", "w");
@@ -702,17 +775,21 @@ void menu_graph_function (struct Tree* tree, int operating_mode)
 
     system ("gnuplot graph_func/graph_function.gnuplot");
 
-    fprintf (tree->tex, "\\\\ \\section{График вашей функции:}");
-    fprintf (tree->tex, "\\\\ \\includegraphics{graph_func/graph.png}\\\\");
+    fprintf (tree->tex, "\\section{График вашей функции:}\n");
+    fprintf (tree->tex, "\\includegraphics{graph_func/graph.png}\n");
 
     if (operating_mode == 1)
     {
         main_menu (tree);
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnuplot)
 {
+    ASSERT_OK_TREE (tree);
+
     int mode = get_command();
 
     switch (mode)
@@ -756,10 +833,14 @@ void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnu
             printf("Неверный режим %c, попробуй еще раз\n", mode);
             processing_selected_mode (tree); 
     }
+
+    ASSERT_OK_TREE (tree);
 }
 
 void tree_print_file (struct Knot* knot, FILE* graph_gnuplot)
 {
+    assert (graph_gnuplot);
+
     fprintf (graph_gnuplot, "(");
 
     if (!knot)
@@ -797,9 +878,8 @@ void tree_print_file (struct Knot* knot, FILE* graph_gnuplot)
             case (POW): fprintf (graph_gnuplot, "**"); break;
             case (DIV): fprintf (graph_gnuplot, "/");  break;
             default:
-            {
-
-            }
+                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                abort ();
         }
     }
     else if (knot->type == FUNCTION)
@@ -812,7 +892,9 @@ void tree_print_file (struct Knot* knot, FILE* graph_gnuplot)
 
             #undef DEF_FUNC
 
-            default: {}
+            default:
+                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                abort ();
         }
     }
     
@@ -828,12 +910,14 @@ void tree_print_file (struct Knot* knot, FILE* graph_gnuplot)
 
 void menu_full_function_study (struct Tree* tree)
 {
+    ASSERT_OK_TREE (tree);
+
     screen_clear ();
 
     printf ("Узнаем значение функции в точке!\n");
     system ("sleep 2");
 
-    menu_value_function_at_point (tree, 0);
+    menu_value_function_at_point (tree, FROM_FULL_STUDY_OR_DIFF, FROM_FULL_STUDY_OR_DIFF);
 
     screen_clear ();
 
@@ -841,7 +925,7 @@ void menu_full_function_study (struct Tree* tree)
     system ("sleep 2");
 
     Tree* tree_copy = all_tree_clone (tree);
-    menu_derivative (tree_copy, 0);
+    menu_derivative (tree_copy, FROM_FULL_STUDY_OR_DIFF);
     tree_dtor (tree_copy);
 
     screen_clear ();
@@ -852,7 +936,7 @@ void menu_full_function_study (struct Tree* tree)
     screen_clear ();
 
     tree_copy = all_tree_clone (tree);
-    menu_taylor_decomposition (tree_copy, 0);
+    menu_taylor_decomposition (tree_copy, FROM_FULL_STUDY_OR_DIFF);
     tree_dtor (tree_copy);
 
     screen_clear ();
@@ -861,7 +945,7 @@ void menu_full_function_study (struct Tree* tree)
     system ("sleep 2");
 
     tree_copy = all_tree_clone (tree);
-    menu_tangent_equation (tree_copy, 0);
+    menu_tangent_equation (tree_copy, FROM_FULL_STUDY_OR_DIFF);
     tree_dtor (tree_copy);
 
     screen_clear ();
@@ -869,7 +953,7 @@ void menu_full_function_study (struct Tree* tree)
     printf ("А теперь самое время построить график!\n");
     system ("sleep 2");
 
-    menu_graph_function (tree, 0);
+    menu_graph_function (tree, FROM_FULL_STUDY_OR_DIFF);
 
     printf ("А на этом все!\n");
     system ("sleep 2");
@@ -881,6 +965,9 @@ void menu_full_function_study (struct Tree* tree)
 
 int find_variable (struct Tree* tree, char* variable)
 {
+    assert (tree);
+    assert (variable);
+
     for (int i = 0; i < tree->variable_number; i++)
     {
         if (strcmp (variable, tree->array_variable[i].variable_name) == 0)
@@ -926,12 +1013,17 @@ void graph_open (struct Tree* tree)
 
 void simplification_tree (struct Tree* tree, struct Knot* current_knot)
 {
+    assert (tree);
+    assert (current_knot);
+
     convolution_const (tree, KNOT);
     neutralization (tree, KNOT);
 }
 
 void convolution_const (struct Tree* tree, struct Knot* current_knot)
 {
+    assert (tree);
+
     if (!type_knot(KNOT))
     {
         if (LKNOT != nullptr) 
@@ -969,6 +1061,8 @@ void convolution_const (struct Tree* tree, struct Knot* current_knot)
 
 void neutralization (struct Tree* tree, struct Knot* current_knot)
 {
+    assert (tree);
+
     if (KNOT != nullptr)
     {
         if (LKNOT != nullptr) 
@@ -1057,7 +1151,6 @@ void neutralization (struct Tree* tree, struct Knot* current_knot)
                         return;
                     }
                 }
-
                 if (RKNOT != nullptr)
                 {
                     if ((RKNOT->type == NUMBER) && RKNOT->value == 1)
@@ -1101,7 +1194,9 @@ void neutralization (struct Tree* tree, struct Knot* current_knot)
                 break;
             }
             default:
-                break;
+                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                abort ();
+                
         }
     }
     else if (TYPE_KNOT == FUNCTION)
@@ -1151,13 +1246,19 @@ void neutralization (struct Tree* tree, struct Knot* current_knot)
                 break;
             }
             default: 
-                break;
+                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                abort ();
         }
     }
 }
 
 void relinking_subtree (struct Tree* tree, struct Knot* current_knot, struct Knot* subtree_linking, struct Knot* subtree_delete)
 {
+    assert (tree);
+    assert (current_knot);
+    assert (subtree_linking);
+    assert (subtree_delete);
+
     if (KNOT == tree->root) 
     {
         tree->root = subtree_linking;
@@ -1207,10 +1308,12 @@ int type_knot (struct Knot* KNOT)
 
 double calculate_knot (struct Tree* tree, struct Knot* current_knot)
 {   
-    assert (KNOT != nullptr);
+    assert (KNOT);
 
     switch (KNOT->type)
-    {
+    {   
+        case VARIABLE:
+            break;
         case NUMBER: 
             return KNOT->value;
         case OPERATION:
@@ -1236,12 +1339,14 @@ double calculate_knot (struct Tree* tree, struct Knot* current_knot)
                 #undef DEF_FUNC
 
                 default:
-                    break;
+                    printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                    abort ();
             }
             break;
 
         default:
-            break;
+            printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+            abort ();
     }
 
     return 0;
@@ -1251,15 +1356,13 @@ double calculate_knot (struct Tree* tree, struct Knot* current_knot)
 
 struct Stack* tree_search_variable (struct Knot* KNOT, struct Variable variable)
 {
-    //ASSERT_OK_TREE (tree);
+    assert (KNOT);
 
     struct Stack* path_element = (struct Stack*) calloc (1, sizeof(Stack));
 
     StackCtor (path_element, 10);
 
-    knot_variable_search(KNOT, path_element, variable);
-
-    //ASSERT_OK_TREE (tree);
+    knot_variable_search (KNOT, path_element, variable);
     
     return path_element;
 }
@@ -1334,30 +1437,67 @@ FILE* tex_open ()
                     "\\DeclareMathOperator{\\arcsinh}{arcsinh}\n"
                     "\\DeclareMathOperator{\\arctanh}{arctanh}\n"
                     "\\DeclareMathOperator{\\e}{e}\n"
+                    "\\DeclareMathOperator{\\tangent}{tangent}\n"
                     "\\begin{document}\n");
 
     return tex;
 }
 
-void tex_tree_print (FILE* tex, struct Tree* tree, char* text)
+void tex_tree_print (FILE* tex, struct Tree* tree, enum PRINT_VARIABLE which_var, int number_variable)
 {
     assert (tex);
     assert (tree);
-    assert (text);
 
-    fprintf (tex, "\n");
-    fprintf (tex, "%s", text);
-    fprintf (tex, "\n");
+    if (which_var == ALL_NAME)                                                                              
+    {                                                                                                       
+        for (int i = 0; i < tree->variable_number; i++)                                                     
+        {                                                                                                  
+            fprintf (tex, "%s", tree->array_variable[i].variable_name);                               
+            if (i != tree->variable_number - 1)                                                             
+            {                                                                                               
+                fprintf (tex, ", ");                                                                  
+            }                                                                                               
+        }                                                                                                   
+    }                                                                                                       
+    else if (which_var == ONLY_WITH_VAL)                                                                    
+    {                                                                                                       
+        for (int i = 0; i <tree->variable_number; i++)                                                      
+        {   
+            double var_val = tree->array_variable[i].variable_value;
+            char* var_name = tree->array_variable[i].variable_name;
 
-    fprintf (tex, "\\begin{center}");
-    fprintf (tex, "\\\\{$");
+            if (var_val == (int)var_val)           
+            {                                                                                         
+                fprintf (tex, "%d", (int)var_val);                          
+            }
+            else if (var_val == var_val)
+            {
+                fprintf (tex, "%lf", var_val);
+            }                                                                                             
+            else                                                                                            
+            {                                                                                               
+                fprintf (tex, "%s", var_name);                            
+            }                                                                                               
+            if (i != tree->variable_number - 1)                                                             
+            {                                                                                               
+                fprintf (tex, ", ");                                                                  
+            }                                                                                               
+        }                                                                                                   
+    }                                                                                                       
+    else if (which_var == ONE_VAR)
+    {
+        fprintf (tex, "%s", tree->array_variable[number_variable].variable_name);
+    }
+    fprintf (tex, ") = ");
+
     tree_print (tex, tree->root);
-    fprintf (tex, "$}");
-    fprintf (tex, "\\end{center}");
+    fprintf (tex, "\\end{equation}");
 }
 
 void tree_print (FILE* tex, struct Knot* knot)
 {
+    assert (tex);
+
     fprintf (tex, "{");
 
     if (knot->type != NUMBER && knot->type != VARIABLE)
@@ -1407,9 +1547,8 @@ void tree_print (FILE* tex, struct Knot* knot)
             case (POW): fprintf (tex, "^"); break;
             case (DIV):                     break;
             default:
-            {
-
-            }
+                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                abort ();
         }
     }
     else if (knot->type == FUNCTION)
@@ -1422,9 +1561,8 @@ void tree_print (FILE* tex, struct Knot* knot)
 
             #undef DEF_FUNC
             default:
-            {
-
-            }
+                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                abort ();
         }
     }
     

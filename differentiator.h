@@ -19,9 +19,8 @@
 
 #define RED_TEXT(text) "\e[31m" #text "\e[0m"
 
-#define TEX_TEXT_PRINT(tree_tex, tree, ...)     char tex_text[MAX_LEN_CMD] = "";                                    \
-                                                snprintf (tex_text, MAX_LEN_CMD, __VA_ARGS__);                      \
-                                                tex_tree_print (tree_tex, tree, tex_text);                          
+#define TEX_TEXT_PRINT(tree_tex, which_var, num_var, tree, ...) fprintf (tree_tex, __VA_ARGS__);                   \
+                                                                tex_tree_print (tree_tex, tree, which_var, num_var);                   
                                                 
 
 
@@ -36,6 +35,18 @@ enum COMMAND {
     COMMAND_6 = 54,
     COMMAND_7 = 55,
     COMMAND_8 = 56,
+    COMMAND_9 = 57,
+};
+
+enum PRINT_VARIABLE {
+    ALL_NAME      = 0,
+    ONLY_WITH_VAL = 1,
+    ONE_VAR       = 2,
+};
+
+enum OPEARTING_MODE {
+    FROM_FULL_STUDY_OR_DIFF = 0,
+    FROM_MAIN_MENU          = 1,
 };
 
 void start_programm (struct Tree* tree);
@@ -46,7 +57,7 @@ void processing_selected_mode (struct Tree* tree);
 
 //---------------------------------------------------------------------------------
 
-void menu_value_function_at_point (struct Tree* tree, int operating_mode);
+void menu_value_function_at_point (struct Tree* tree, int operating_mode, int operating_mode_point_value);
 
 void processing_selected_value_at_point_mode (struct Tree* tree, int counter);
 
@@ -122,7 +133,7 @@ int knot_variable_search (struct Knot* current_knot, struct Stack* path_element,
 
 FILE* tex_open ();
 
-void tex_tree_print (FILE* tex, struct Tree* tree, char* text);
+void tex_tree_print (FILE* tex, struct Tree* tree, enum PRINT_VARIABLE which_var, int number_variable);
 
 void tree_print (FILE* tex, struct Knot* knot);
 

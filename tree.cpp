@@ -3,6 +3,8 @@
 
 void tree_ctor (struct Tree* tree)
 {
+    assert (tree);
+
     tree->tex = tex_open ();
     
     tree->size = 0;
@@ -32,7 +34,7 @@ void tree_ctor (struct Tree* tree)
 
 void tree_dtor (struct Tree* tree)
 {
-    ASSERT_OK_TREE(tree);
+    assert (tree);
 
     if (tree->buffer_function != nullptr)
     {
@@ -83,6 +85,12 @@ Knot* knot_creater (Knot* prev, Knot* left, Knot* right, enum TYPE type)
 {
     struct Knot* new_knot = (Knot*) calloc (1, sizeof(Knot));
 
+    if (new_knot == nullptr)
+    {
+        printf ("calloc error: in tree.cpp on %d\n", __LINE__);
+        abort ();
+    }
+
     new_knot->prev  = prev;
     new_knot->left  = left;
     new_knot->right = right;
@@ -119,7 +127,13 @@ Knot* knot_func_creater (Knot* prev, Knot* left, Knot* right, enum MATH_FUNC FUN
 Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable)
 {
     Knot* new_knot = knot_creater (prev, left, right, VARIABLE);
+
     new_knot->variable = (char*) calloc (MAX_LEN_STR, sizeof(char));
+    if (new_knot->variable == nullptr)
+    {
+        printf ("calloc error: in tree.cpp on %d\n", __LINE__);
+        abort ();
+    }
     strcpy (new_knot->variable, variable);
 
     return new_knot;
@@ -127,6 +141,8 @@ Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable)
 
 Knot* knot_clone (Knot* current_knot, Knot* prev)
 {
+    assert (current_knot);
+
     Knot* copy_knot = knot_creater (prev, current_knot->left, current_knot->right, current_knot->type);
 
     switch (current_knot->type)
@@ -145,9 +161,8 @@ Knot* knot_clone (Knot* current_knot, Knot* prev)
             copy_knot->function = current_knot->function;
             break;
         default:
-        {
-
-        }
+            printf ("syntax error in tree: in tree.cpp on %d\n", __LINE__);
+            abort ();
     }
 
     return copy_knot;
@@ -156,6 +171,11 @@ Knot* knot_clone (Knot* current_knot, Knot* prev)
 Tree* tree_clone (Knot* current_knot)
 {
     Tree* tree_clone = (Tree*) calloc (1, sizeof(Tree));
+    if (tree_clone == nullptr)
+    {
+        printf ("calloc error: in tree.cpp on %d\n", __LINE__);
+        abort ();
+    }
 
     tree_clone->root = all_knot_clone (current_knot);
 
@@ -172,8 +192,15 @@ Tree* all_tree_clone (Tree* tree)
     tree_copy->size            = tree->size;
 
     for (int i = 0; i < tree->variable_number; i++)
-    {
-        tree_copy->array_variable[i].variable_value = tree->array_variable[i].variable_value;
+    {   
+        if (tree->array_variable[i].variable_value != tree->array_variable[i].variable_value)
+        {
+            tree_copy->array_variable[i].variable_value = NAN;
+        }
+        else
+        {
+            tree_copy->array_variable[i].variable_value = tree->array_variable[i].variable_value;
+        }
         strcpy (tree_copy->array_variable[i].variable_name, tree->array_variable[i].variable_name);
     }
 
@@ -215,7 +242,10 @@ int tree_error (struct Tree* tree)
 
     if (pointer_list_check_null == 0)
     {
-
+        tree->code_error |= CHECK_ERROR (!tree->root,                    TREE_ERROR_POINTER_ROOT_NULL);
+        //tree->code_error |= CHECK_ERROR (!tree->buffer_function,         TREE_ERROR_POINTER_BUFFER_NULL);
+        //tree->code_error |= CHECK_ERROR (!tree->file_function,           TREE_ERROR_POINTER_FILE_INFO_NULL);
+        tree->code_error |= CHECK_ERROR (tree->size < 0,                 TREE_ERROR_SIZE_SMALLER_ZERO);
     }
 
     return tree->code_error;
@@ -227,11 +257,13 @@ int tree_error (struct Tree* tree)
 //-----------------------------------------------------------------------------------
 void knot_graph (struct Tree* tree, struct Knot* current_knot, FILE* tree_log_graph, int* count)
 {
+    assert (tree);
+    assert (tree_log_graph);
+
     if (current_knot == nullptr)
     {
         return;
     }
-
     (*count)++;
 
     if (current_knot->right == nullptr && current_knot->left == nullptr)
@@ -374,6 +406,8 @@ void knot_graph (struct Tree* tree, struct Knot* current_knot, FILE* tree_log_gr
 
 int tree_graph_dump (struct Tree* tree)
 {
+    assert (tree);
+
     static int number_of_function_launches = 0;
 
     FILE* tree_log_graph = fopen ("graph/graph_log_tree.dot", "w");

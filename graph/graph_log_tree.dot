@@ -2,10 +2,5 @@ digraph G
 {
 	graph [dpi = 250];
 	rankdir = TB;
-	"0x604000000410" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x0 \lcurrent = 0x604000000410 | {<left> left = 0x0| EXP | <right> right = 0x6040000003d0}"]
-	 "0x604000000410" -> "0x6040000003d0" [style = "bold"]
-	"0x6040000003d0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000410 \lcurrent = 0x6040000003d0 | {<left> left = 0x0| x | <right> right = 0x0}"]
 
 }

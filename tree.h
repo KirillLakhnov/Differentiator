@@ -45,10 +45,11 @@ enum TREE_ERROR
     TREE_ERROR_POINTER_BUFFER_NULL    = 1 << 4,
     TREE_ERROR_POINTER_FILE_INFO_NULL = 1 << 5,
     TREE_ERROR_SIZE_SMALLER_ZERO      = 1 << 6,
+    TREE_ERROR_SYNTAX_IN_TREE         = 1 << 7,
 
-    TREE_ERROR_CALLOC         = 1 << 3,
-    TREE_ERROR_STRCPY         = 1 << 4,
-    TREE_ERROR_BUFFER_CREATER = 1 << 5,
+    TREE_ERROR_CALLOC         = 1 << 8,
+    TREE_ERROR_STRCPY         = 1 << 9,
+    TREE_ERROR_BUFFER_CREATER = 1 << 10,
 };
 
 enum TYPE {

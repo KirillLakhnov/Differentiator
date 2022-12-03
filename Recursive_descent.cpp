@@ -2,19 +2,30 @@
 
 Knot* GetG (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
 
     Knot* current_knot = GetE (str, tree);
 
     pass_space (str);
 
-    assert (**str == '\0');
+    if (**str != '\0')
+    {
+        tree->code_error |= TREE_ERROR_SYNTAX_IN_BASE;
+        printf ("syntax error: in Recursive_descent.cpp on %d, code_error = %lu", __LINE__, tree->code_error);
+        abort ();
+    }
 
     return current_knot;
 }
 
 Knot* GetE (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
 
     Knot* current_knot = GetT (str, tree);
@@ -51,6 +62,9 @@ Knot* GetE (char** str, struct Tree* tree)
 
 Knot* GetT (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
     Knot* current_knot = GetPow (str, tree);
 
@@ -86,6 +100,9 @@ Knot* GetT (char** str, struct Tree* tree)
 
 Knot* GetPow (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
     Knot* current_knot = GetP (str, tree);
 
@@ -117,6 +134,9 @@ Knot* GetPow (char** str, struct Tree* tree)
 
 Knot* GetP (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
 
     int unary_sign = is_unary_sign (str);
@@ -159,6 +179,9 @@ Knot* GetP (char** str, struct Tree* tree)
 
 Knot* GetFunc (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
 
     Knot* current_knot = nullptr;
@@ -197,6 +220,9 @@ Knot* GetFunc (char** str, struct Tree* tree)
 
 Knot* GetV (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
 
     Knot* current_knot = nullptr;
@@ -229,6 +255,9 @@ Knot* GetV (char** str, struct Tree* tree)
 
 Knot* GetN (char** str, struct Tree* tree)
 {
+    assert (str);
+    assert (tree);
+
     pass_space (str);
     double value = 0;
 
@@ -240,7 +269,13 @@ Knot* GetN (char** str, struct Tree* tree)
         value = value*10 + **str - '0';
         (*str)++;
     }
-    assert (*str != s_old);
+
+    if (*str == s_old)
+    {
+        tree->code_error |= TREE_ERROR_SYNTAX_IN_BASE;
+        printf ("syntax error: in Recursive_descent.cpp on %d, code_error = %lu", __LINE__, tree->code_error);
+        abort ();
+    }
 
     current_knot->value = value;
 
@@ -252,6 +287,8 @@ Knot* GetN (char** str, struct Tree* tree)
 
 int is_unary_sign (char** str)
 {
+    assert (str);
+
     pass_space (str);
 
     if (**str == '-')
@@ -271,6 +308,8 @@ int is_unary_sign (char** str)
 
 int is_math_func (char** str)
 {
+    assert (str);
+
     char math_func[250] = {0};
 
     char* str_old = *str;
@@ -299,6 +338,8 @@ int is_math_func (char** str)
 
 void pass_space (char** str)
 {
+    assert (str);
+    
     while (isspace (**str) != 0)
     {
         (*str)++;
