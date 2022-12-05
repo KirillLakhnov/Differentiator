@@ -1,25 +1,23 @@
 \documentclass[12pt,a4paper]{scrartcl}
+\usepackage[a1paper]{geometry}\geometry{papersize={40.7 cm, 40.0 cm}}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
 \usepackage{indentfirst}
 \usepackage{misccorr}
 \usepackage{graphicx}
-\usepackage{mathtools}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
 \DeclareMathOperator{\arccosh}{arccosh}
 \DeclareMathOperator{\arcsinh}{arcsinh}
 \DeclareMathOperator{\arctanh}{arctanh}
 \DeclareMathOperator{\e}{e}
 \DeclareMathOperator{\tangent}{tangent}
+\DeclareMathOperator{\errors}{errors}
 \begin{document}
 \section{Ваша изначальная функция:} 
- \begin{equation} f(x, y, z) = {(\ln{({({x}+{y})}+{z})})}\end{equation}
-\section{Значение функции в точке.}
-\noindent \textbf {Значения переменных при рассчете значения функции:}
-\begin{enumerate}
-	\item x = 10,000000
-	\item y = 25,000000
-\end{enumerate}
-\noindent \textbf {Значение функции в заданной точке:}
- \begin{equation} f(10, 25, z) = {(\ln{({35}+{z})})}\end{equation}
+ \begin{equation} f(x) = {({({(\cos{x})}+{({(\sin{x})}^{2})})}+{x})}\end{equation}
+\section{Общая формула погрешность вашей функции:} 
+Значения абсолютных погрешностей величин: \\
+	1) {${\Delta x = 0,34}$} \\
+\begin{equation} f_{\errors}(x) = {(\sqrt{({({({({({({-1}*{(\sin{x})})}+{({2}*{({(\cos{x})}*{(\sin{x})})})})}+{1})}^{2})}*{0,1156})}+)})}\end{equation}
 
 \end{document}

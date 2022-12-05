@@ -145,11 +145,13 @@ Knot* knot_creater (Knot* prev, Knot* left, Knot* right, enum TYPE TYPE);
 
 Knot* knot_op_creater (Knot* prev, Knot* left, Knot* right, enum OPERATION_TYPE OP);
 
-Knot* knot_num_creater (Knot* prev, Knot* left, Knot* right, int value);
+Knot* knot_num_creater (Knot* prev, Knot* left, Knot* right, double value);
 
 Knot* knot_func_creater (Knot* prev, Knot* left, Knot* right, enum MATH_FUNC FUNC);
 
 Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable);
+
+void relinking_prev_knot (Knot* current_knot, Knot* new_knot);
 
 Knot* knot_clone (Knot* current_knot, Knot* prev);
 

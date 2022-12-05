@@ -38,4 +38,7 @@ Diff
 
 .vscode
 .gitattributes
+
 .DS_Store
+graph/.DS_Store
+libraries/.DS_Store

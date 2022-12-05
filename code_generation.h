@@ -16,7 +16,7 @@ DEF_FUNC(TG,  tan, tan, {Knot* div_knot = knot_op_creater (PKNOT, dR, nullptr, D
 
 DEF_FUNC(LN, log, ln,   {TYPE_KNOT = OPERATION; \
                         OP_KNOT    = DIV;       \
-                        LKNOT      = dR;})      \
+                        LKNOT      = dR;})
             
 DEF_FUNC(ARCSIN, asin, arcsin,  {Knot* div_knot = knot_op_creater (PKNOT, dR, nullptr, DIV);                    \
                                 R(div_knot) = knot_func_creater (div_knot, nullptr, nullptr, SQRT);             \

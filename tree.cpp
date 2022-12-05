@@ -108,7 +108,7 @@ Knot* knot_op_creater (Knot* prev, Knot* left, Knot* right, enum OPERATION_TYPE 
     return new_knot;
 }
 
-Knot* knot_num_creater (Knot* prev, Knot* left, Knot* right, int value)
+Knot* knot_num_creater (Knot* prev, Knot* left, Knot* right, double value)
 {
     Knot* new_knot = knot_creater (prev, left, right, NUMBER);
     new_knot->value = value;  
@@ -137,6 +137,18 @@ Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable)
     strcpy (new_knot->variable, variable);
 
     return new_knot;
+}
+
+void relinking_prev_knot (Knot* current_knot, Knot* new_knot)
+{
+    if (PKNOT->left == KNOT)
+    {
+        PKNOT->left = new_knot;
+    }
+    else if (PKNOT->right == KNOT)
+    {
+        PKNOT->right = new_knot;
+    }
 }
 
 Knot* knot_clone (Knot* current_knot, Knot* prev)
@@ -199,7 +211,7 @@ Tree* all_tree_clone (Tree* tree)
         }
         else
         {
-            tree_copy->array_variable[i].variable_value = tree->array_variable[i].variable_value;
+        tree_copy->array_variable[i].variable_value = tree->array_variable[i].variable_value;
         }
         strcpy (tree_copy->array_variable[i].variable_name, tree->array_variable[i].variable_name);
     }

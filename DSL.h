@@ -13,6 +13,7 @@
 #define R(knot) knot->right
 
 #define LL(knot) knot->left->left
+#define LR(knot) knot->left->right
 
 #define RL(knot) knot->right->left
 #define RR(knot) knot->right->right
@@ -22,8 +23,8 @@
 
 #define RRRR(knot) knot->right->right->right->right
 
-#define dC derivative (tree, tree_copy->root,       number_variable)
-#define dL derivative (tree, tree_copy->root->left, number_variable)
+#define dC derivative (tree, tree_copy->root,        number_variable)
+#define dL derivative (tree, tree_copy->root->left,  number_variable)
 #define dR derivative (tree, tree_copy->root->right, number_variable)
 
 #define d(knot) derivative (tree, knot, number_variable)

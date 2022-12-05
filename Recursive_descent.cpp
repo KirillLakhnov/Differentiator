@@ -239,10 +239,15 @@ Knot* GetV (char** str, struct Tree* tree)
 
             index++;
             (*str)++;
-        } 
+        }
 
-        strcpy (tree->array_variable[tree->variable_number].variable_name, current_knot->variable);
-        tree->variable_number++;
+        int number_variable = find_variable (tree, current_knot->variable);
+
+        if (number_variable == -1)
+        {
+            strcpy (tree->array_variable[tree->variable_number].variable_name, current_knot->variable);
+            tree->variable_number++;
+        }
     }
     else
     {

@@ -19,7 +19,8 @@
 
 #define RED_TEXT(text) "\e[31m" #text "\e[0m"
 
-#define TEX_TEXT_PRINT(tree_tex, which_var, num_var, tree, ...) fprintf (tree_tex, __VA_ARGS__);                   \
+#define TEX_TEXT_PRINT(tree_tex, which_var, num_var, tree, ...) fprintf (tree_tex, __VA_ARGS__);                    \
+                                                                simplification_tree (tree, tree->root);             \
                                                                 tex_tree_print (tree_tex, tree, which_var, num_var);                   
                                                 
 
@@ -47,6 +48,12 @@ enum PRINT_VARIABLE {
 enum OPEARTING_MODE {
     FROM_FULL_STUDY_OR_DIFF = 0,
     FROM_MAIN_MENU          = 1,
+};
+
+struct Error_variable
+{
+    char*  name_var;
+    double value_errors_var;
 };
 
 void start_programm (struct Tree* tree);
@@ -96,6 +103,12 @@ void menu_graph_function (struct Tree* tree, int operating_mode);
 void processing_selected_graph_function_mode (struct Tree* tree, FILE* graph_gnuplot);
 
 void tree_print_file (struct Knot* knot, FILE* graph_gnuplot);
+
+//---------------------------------------------------------------------------------
+
+void menu_error_function (struct Tree* tree, int operating_mode);
+
+void error_function (struct Tree* tree, struct Error_variable* errors_variable);
 
 //---------------------------------------------------------------------------------
 
