@@ -142,6 +142,8 @@ struct Stack* tree_search_variable (struct Knot* current_knot, struct Variable v
 
 int knot_variable_search (struct Knot* current_knot, struct Stack* path_element, struct Variable variable);
 
+int tree_search_all_variable (struct Knot* current_knot, struct Tree* tree);
+
 //---------------------------------------------------------------------------------
 
 FILE* tex_open ();

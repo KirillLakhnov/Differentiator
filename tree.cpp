@@ -141,6 +141,11 @@ Knot* knot_var_creater (Knot* prev, Knot* left, Knot* right, char* variable)
 
 void relinking_prev_knot (Knot* current_knot, Knot* new_knot)
 {
+    if (PKNOT == nullptr)
+    {
+        return;
+    }
+
     if (PKNOT->left == KNOT)
     {
         PKNOT->left = new_knot;

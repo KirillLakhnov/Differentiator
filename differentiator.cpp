@@ -496,7 +496,7 @@ Knot* derivative (struct Tree* tree, struct Knot* current_knot, int number_varia
     }
 
     ASSERT_OK_TREE (tree);
-    
+
     Knot* knot_simple = all_knot_clone (KNOT);
     knot_dtor (KNOT);
     KNOT = knot_simple;
@@ -963,13 +963,19 @@ void error_function (struct Tree* tree, struct Error_variable* errors_variable)
         {
             RKNOT = knot_op_creater (KNOT, nullptr, nullptr, ADD);
         }
+        else
+        {
+            RKNOT = knot_num_creater (KNOT, nullptr, nullptr, 0);
+        }
 
         RKNOT->prev = KNOT;
         KNOT = RKNOT;
     }
 
     Knot* sqrt_knot = knot_func_creater (tree->root->prev, nullptr, tree->root, SQRT);
+    tree->root->prev = sqrt_knot;
     tree->root = sqrt_knot;
+
 
     tree_dtor (tree_copy);
 
@@ -1280,53 +1286,26 @@ void neutralization (struct Tree* tree, struct Knot* current_knot)
     }
     else if (TYPE_KNOT == FUNCTION)
     {
-        switch (FUNC_KNOT)
+        int find_variable = tree_search_all_variable (current_knot->right, tree);
+
+        if (find_variable == 0)
         {
-            case LN:
-            case ARCCOS:
-            case ARCCH:
+            switch (FUNC_KNOT)
             {
-                if ((RKNOT->type == NUMBER) && RKNOT->value == 1)
-                {
-                    TYPE_KNOT = NUMBER;
-                    KNOT->value = 0;
-                    return;
-                }
-                break;
+                #define DEF_FUNC(FUNC, func, func_tex, ...) case (FUNC):                                                                        \
+                                                            {                                                                                   \
+                                                                Knot* calc_knot = knot_num_creater (PKNOT, nullptr, nullptr, func (RCALC));     \
+                                                                relinking_subtree (tree, KNOT, calc_knot, KNOT);                                \
+                                                                break;                                                                          \
+                                                            }
+                #include "code_generation.h"
+
+                #undef DEF_FUNC
+
+                default:
+                    printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
+                    abort ();
             }
-            case SIN:
-            case TG:
-            case ARCSIN:
-            case ARCTG:
-            case SH:
-            case TH:
-            case ARCSH:
-            case ARCTH:
-            case SQRT:
-            {
-                if ((RKNOT->type == NUMBER) && RKNOT->value == 0)
-                {
-                    TYPE_KNOT = NUMBER;
-                    KNOT->value = 0;
-                    return;
-                }
-                break;
-            }
-            case COS:
-            case CH:
-            case EXP:
-            {
-                if ((RKNOT->type == NUMBER) && RKNOT->value == 0)
-                {
-                    TYPE_KNOT = NUMBER;
-                    KNOT->value = 1;
-                    return;
-                }
-                break;
-            }
-            default: 
-                printf ("ERROR_SYNTAX_IN_TREE: in differentiator.cpp on line %d", __LINE__);
-                abort ();
         }
     }
 }
@@ -1390,9 +1369,7 @@ double calculate_knot (struct Tree* tree, struct Knot* current_knot)
     assert (KNOT);
 
     switch (KNOT->type)
-    {   
-        case VARIABLE:
-            break;
+    {
         case NUMBER: 
             return KNOT->value;
         case OPERATION:
@@ -1491,6 +1468,27 @@ int knot_variable_search (struct Knot* KNOT, struct Stack* path_element, struct 
 
         return 0;
     }
+}
+
+int tree_search_all_variable (struct Knot* current_knot, struct Tree* tree)
+{
+    struct Stack* find_variable = nullptr;
+
+    for (int i = 0; i < tree->variable_number; i++)
+    {
+        find_variable = tree_search_variable (KNOT, tree->array_variable[i]);
+
+        size_t find_variable_rezult = find_variable->size;
+
+        StackDtor (find_variable);
+
+        if (find_variable_rezult != 0)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------------
