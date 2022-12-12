@@ -2,49 +2,22 @@ digraph G
 {
 	graph [dpi = 250];
 	rankdir = TB;
-	"0x604000000b90" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x0 \lcurrent = 0x604000000b90 | {<left> left = 0x0| SQRT | <right> right = 0x604000000550}"]
-	 "0x604000000b90" -> "0x604000000550" [style = "bold"]
-	"0x604000000550" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000b90 \lcurrent = 0x604000000550 | {<left> left = 0x604000000590| + | <right> right = 0x604000000b50}"]
-	 "0x604000000550" -> "0x604000000590" [style = "bold"]
-	 "0x604000000550" -> "0x604000000b50" [style = "bold"]
-	"0x604000000590" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000550 \lcurrent = 0x604000000590 | {<left> left = 0x604000000a10| * | <right> right = 0x604000000a90}"]
-	 "0x604000000590" -> "0x604000000a10" [style = "bold"]
-	 "0x604000000590" -> "0x604000000a90" [style = "bold"]
-	"0x604000000a10" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000590 \lcurrent = 0x604000000a10 | {<left> left = 0x604000000890| ^ | <right> right = 0x604000000a50}"]
-	 "0x604000000a10" -> "0x604000000890" [style = "bold"]
-	 "0x604000000a10" -> "0x604000000a50" [style = "bold"]
-	"0x604000000890" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000a10 \lcurrent = 0x604000000890 | {<left> left = 0x6040000008d0| * | <right> right = 0x604000000910}"]
-	 "0x604000000890" -> "0x6040000008d0" [style = "bold"]
-	 "0x604000000890" -> "0x604000000910" [style = "bold"]
-	"0x6040000008d0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000890 \lcurrent = 0x6040000008d0 | {<left> left = 0x0| 1,000000 | <right> right = 0x0}"]
-	"0x604000000910" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000890 \lcurrent = 0x604000000910 | {<left> left = 0x604000000950| * | <right> right = 0x604000000990}"]
-	 "0x604000000910" -> "0x604000000950" [style = "bold"]
-	 "0x604000000910" -> "0x604000000990" [style = "bold"]
-	"0x604000000950" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000910 \lcurrent = 0x604000000950 | {<left> left = 0x0| -1,000000 | <right> right = 0x0}"]
-	"0x604000000990" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000910 \lcurrent = 0x604000000990 | {<left> left = 0x0| SIN | <right> right = 0x6040000009d0}"]
-	 "0x604000000990" -> "0x6040000009d0" [style = "bold"]
-	"0x6040000009d0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000990 \lcurrent = 0x6040000009d0 | {<left> left = 0x0| x | <right> right = 0x0}"]
-	"0x604000000a50" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000a10 \lcurrent = 0x604000000a50 | {<left> left = 0x0| 2,000000 | <right> right = 0x0}"]
-	"0x604000000a90" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
-		label = "prev = 0x604000000590 \lcurrent = 0x604000000a90 | {<left> left = 0x604000000ad0| ^ | <right> right = 0x604000000b10}"]
-	 "0x604000000a90" -> "0x604000000ad0" [style = "bold"]
-	 "0x604000000a90" -> "0x604000000b10" [style = "bold"]
-	"0x604000000ad0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000a90 \lcurrent = 0x604000000ad0 | {<left> left = 0x0| 12,000000 | <right> right = 0x0}"]
-	"0x604000000b10" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000a90 \lcurrent = 0x604000000b10 | {<left> left = 0x0| 2,000000 | <right> right = 0x0}"]
-	"0x604000000b50" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
-		label = "prev = 0x604000000550 \lcurrent = 0x604000000b50 | {<left> left = 0x0| 0,000000 | <right> right = 0x0}"]
+	"0x6040000004d0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
+		label = "prev = 0x0 \lcurrent = 0x6040000004d0 | {<left> left = 0x604000000390| * | <right> right = 0x604000000490}"]
+	 "0x6040000004d0" -> "0x604000000390" [style = "bold"]
+	 "0x6040000004d0" -> "0x604000000490" [style = "bold"]
+	"0x604000000390" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
+		label = "prev = 0x6040000004d0 \lcurrent = 0x604000000390 | {<left> left = 0x0| x | <right> right = 0x0}"]
+	"0x604000000490" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
+		label = "prev = 0x6040000004d0 \lcurrent = 0x604000000490 | {<left> left = 0x604000000410| ^ | <right> right = 0x604000000550}"]
+	 "0x604000000490" -> "0x604000000410" [style = "bold"]
+	 "0x604000000490" -> "0x604000000550" [style = "bold"]
+	"0x604000000410" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#87CEFA",
+		label = "prev = 0x604000000490 \lcurrent = 0x604000000410 | {<left> left = 0x0| LN | <right> right = 0x6040000003d0}"]
+	 "0x604000000410" -> "0x6040000003d0" [style = "bold"]
+	"0x6040000003d0" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
+		label = "prev = 0x604000000410 \lcurrent = 0x6040000003d0 | {<left> left = 0x0| x | <right> right = 0x0}"]
+	"0x604000000550" [shape = "record", style = "rounded, filled", fontname = "Helvetica-Bold", fillcolor = "#ee9b52",
+		label = "prev = 0x604000000490 \lcurrent = 0x604000000550 | {<left> left = 0x0| 2,000000 | <right> right = 0x0}"]
 
 }

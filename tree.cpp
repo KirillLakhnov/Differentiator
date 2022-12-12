@@ -79,7 +79,6 @@ void knot_dtor (struct Knot* current_knot)
         }
     }
 }
-//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 Knot* knot_creater (Knot* prev, Knot* left, Knot* right, enum TYPE type)
 {
